@@ -1,6 +1,9 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System;
+using Cysharp.Threading.Tasks;
+using Signals;
 using UnityEngine;
 using Zenject;
+using Random = UnityEngine.Random;
 
 public class HazardSpawner : MonoBehaviour
 {
@@ -18,16 +21,18 @@ public class HazardSpawner : MonoBehaviour
     [SerializeField] private Asteroid _asteroidPrefab;
     [SerializeField] private Transform _asteroidContainer;
 
-    private ObjectPool<UFO> _ufoPool;
-    private ObjectPool<Asteroid> _asteroidPool;
+    public ObjectPool<UFO> UFOPool { get; private set; }
+    public ObjectPool<Asteroid> AsteroidsPool{get; private set;}
 
+    private SignalBus _signalBus;
     private bool _isSpawning = true;
 
     [Inject]
-    public void Construct()
+    public void Construct(SignalBus signalBus)
     {
-        _ufoPool = new ObjectPool<UFO>(_ufoCapacity, _ufoPrefab, _ufoContainer);
-        _asteroidPool = new ObjectPool<Asteroid>(_asteroidsCapacity, _asteroidPrefab, _asteroidContainer);
+        UFOPool = new ObjectPool<UFO>(_ufoCapacity, _ufoPrefab, _ufoContainer);
+        AsteroidsPool = new ObjectPool<Asteroid>(_asteroidsCapacity, _asteroidPrefab, _asteroidContainer);
+        _signalBus = signalBus;
     }
 
     private void Start()
@@ -36,9 +41,15 @@ public class HazardSpawner : MonoBehaviour
         
     }
 
+    private void OnEnable()
+    {
+        _signalBus.Subscribe<AsteroidDeadSignal>(ReturnAsteroidToPool);
+    }
+
     private void OnDisable()
     {
         _isSpawning = false;
+        _signalBus.Unsubscribe<AsteroidDeadSignal>(ReturnAsteroidToPool);
     }
 
     private async UniTaskVoid SpawnLoop()
@@ -62,14 +73,14 @@ public class HazardSpawner : MonoBehaviour
 
         if (spawnUfo)
         {
-            if (_ufoPool.TryGetObject(out var ufo))
+            if (UFOPool.TryGetObject(out var ufo))
             {
                 PlaceAndActivate(ufo.transform, spawnPoint);
             }
         }
         else
         {
-            if (_asteroidPool.TryGetObject(out var asteroid))
+            if (AsteroidsPool.TryGetObject(out var asteroid))
             {
                 PlaceAndActivate(asteroid.transform, spawnPoint);
             }
@@ -81,5 +92,10 @@ public class HazardSpawner : MonoBehaviour
         hazard.position = spawnPoint.position;
         hazard.rotation = spawnPoint.rotation;
         hazard.gameObject.SetActive(true);
+    }
+
+    private void ReturnAsteroidToPool(AsteroidDeadSignal args)
+    {
+        AsteroidsPool.ReturnObject(args.Asteroid);
     }
 }
