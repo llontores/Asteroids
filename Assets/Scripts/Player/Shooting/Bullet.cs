@@ -18,7 +18,7 @@ public class Bullet : MonoBehaviour
     private void Awake()
     {
         _physics = new Physics(_thrust, _dragForce, _maxSpeed);
-    }
+    } 
 
     private void Update()
     {

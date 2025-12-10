@@ -153,6 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b133800abe6445f1bce9b8eed691f9ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _hazardSpawner: {fileID: 0}
 --- !u!61 &155156608
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -249,7 +250,7 @@ MonoBehaviour:
   - {fileID: 1254559520}
   _ufoCapacity: 20
   _ufoPrefab: {fileID: 8963031778390121647, guid: 137cec28d36f8414ea362c0efb9bf441, type: 3}
-  _ufoContainer: {fileID: 1158963069621891342, guid: aac7e98a6d24e2c4292be6da3c4d75e8, type: 3}
+  _ufoContainer: {fileID: 1601720354}
   _asteroidsCapacity: 10
   _asteroidPrefab: {fileID: 7088939863630968828, guid: aac7e98a6d24e2c4292be6da3c4d75e8, type: 3}
   _asteroidContainer: {fileID: 2058280045}
@@ -262,7 +263,7 @@ Transform:
   m_GameObject: {fileID: 218693362}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -571,7 +572,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: fd4b0d0532aa1214882b96be7dd68685, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -660,6 +661,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 218693364}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -45.05}
+--- !u!1 &1601720353
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1601720354}
+  m_Layer: 0
+  m_Name: UFOContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1601720354
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1601720353}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.17367053, y: -0.9648364, z: 0.024120886}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2025016350
 GameObject:
   m_ObjectHideFlags: 0
@@ -1008,3 +1040,4 @@ SceneRoots:
   - {fileID: 417825195}
   - {fileID: 218693364}
   - {fileID: 2058280045}
+  - {fileID: 1601720354}
