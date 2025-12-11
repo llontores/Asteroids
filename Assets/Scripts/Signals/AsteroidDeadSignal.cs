@@ -1,4 +1,4 @@
-using DefaultNamespace;
+﻿using DefaultNamespace;
 
 namespace Signals
 {

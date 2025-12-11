@@ -1,8 +1,6 @@
 ﻿using DefaultNamespace;
-using Signals;
 using UnityEngine;
 using UnityEngine.Events;
-using Zenject;
 
 public class Asteroid : MonoBehaviour, IShootable
 {
@@ -15,14 +13,18 @@ public class Asteroid : MonoBehaviour, IShootable
     [SerializeField] private float _reward;
     [SerializeField] private float _spinningMinSpeed;
     [SerializeField] private float _spinningMaxSpeed;
-
-    public event UnityAction<Asteroid> Dead;
+    [SerializeField] private Fragment _fragmentPrefab;
+    [SerializeField] private int _minFragmentAmount;
+    [SerializeField] private int _maxFragmentAmount;
+    
+    public event UnityAction<Asteroid> OnDead;
     
     private int _spinningTurn;
     private float _spinningSpeed;
     private Vector2 _velocity;
     private Physics _physics;
     private Vector3 _direction;
+    private ObjectPool<Fragment> _asteroidPool;
     
     private void Start()
     {
@@ -52,6 +54,6 @@ public class Asteroid : MonoBehaviour, IShootable
 
     public void Die()
     {
-        Dead?.Invoke(this);
+        OnDead?.Invoke(this);
     }
 }

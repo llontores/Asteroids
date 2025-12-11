@@ -45,6 +45,7 @@ public class PlayerShooter : IInitializable, IDisposable
             bullet.transform.position = _shootPoint.position;
             bullet.transform.rotation = _shootPoint.rotation;
             bullet.gameObject.SetActive(true);
+            bullet.OnBulletDestroyed += ReturnBulletToPool;
         }
         
         _canShootBullets =  false;
@@ -55,5 +56,11 @@ public class PlayerShooter : IInitializable, IDisposable
     {
         await UniTask.Delay(_bulletShootCooldown);
         _canShootBullets = true;
+    }
+    
+    private void ReturnBulletToPool(Bullet bullet)
+    {
+        bullet.OnBulletDestroyed -= ReturnBulletToPool;
+        BulletPool.ReturnObject(bullet);
     }
 }

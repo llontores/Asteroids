@@ -76,7 +76,7 @@ public class HazardSpawner : MonoBehaviour
             {
                 PlaceAndActivate(asteroid.transform, spawnPoint);
                 asteroid.SetDirection(spawnPoint.up);
-                asteroid.Dead += ReturnAsteroidToPool;
+                asteroid.OnDead += ReturnAsteroidToPool;
             }
         }
     }
@@ -90,7 +90,7 @@ public class HazardSpawner : MonoBehaviour
 
     public void ReturnAsteroidToPool(Asteroid asteroid)
     {
-        asteroid.Dead -= ReturnAsteroidToPool;
+        asteroid.OnDead -= ReturnAsteroidToPool;
         AsteroidsPool.ReturnObject(asteroid);
     }
 

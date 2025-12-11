@@ -1,5 +1,6 @@
 ﻿using DefaultNamespace;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Bullet : MonoBehaviour
 {
@@ -7,6 +8,8 @@ public class Bullet : MonoBehaviour
     [SerializeField] private float _thrust;
     [SerializeField] private float _dragForce;
 
+    public event UnityAction<Bullet> OnBulletDestroyed;
+    
     private Physics _physics;
     private Vector2 _velocity;
 
@@ -33,5 +36,10 @@ public class Bullet : MonoBehaviour
         {
             shootable.Die();
         }
+    }
+
+    public void Destroy()
+    {
+        OnBulletDestroyed?.Invoke(this);
     }
 }

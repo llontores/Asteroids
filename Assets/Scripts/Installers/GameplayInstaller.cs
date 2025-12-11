@@ -21,6 +21,6 @@ public class GameplayInstaller : MonoInstaller
         Container.DeclareSignal<AccelerationSignal>();
         Container.DeclareSignal<TurnSignal>();
         Container.DeclareSignal<BulletShootSignal>();
-        Container.DeclareSignal<AsteroidDeadSignal>();
+        Container.DeclareSignal<AccelerationSignal>();
     }
 }
