@@ -1,6 +1,7 @@
 ﻿using DefaultNamespace;
 using Signals;
 using UnityEngine;
+using UnityEngine.Events;
 using Zenject;
 
 public class Asteroid : MonoBehaviour, IShootable
@@ -14,15 +15,15 @@ public class Asteroid : MonoBehaviour, IShootable
     [SerializeField] private float _reward;
     [SerializeField] private float _spinningMinSpeed;
     [SerializeField] private float _spinningMaxSpeed;
+
+    public event UnityAction<Asteroid> Dead;
     
     private int _spinningTurn;
     private float _spinningSpeed;
-    
     private Vector2 _velocity;
     private Physics _physics;
-    private SignalBus _signalBus;
+    private Vector3 _direction;
     
-
     private void Start()
     {
         _physics = new Physics(_thrust, _drag, _maxSpeed);
@@ -38,14 +39,19 @@ public class Asteroid : MonoBehaviour, IShootable
 
     public void Update()
     {
-        _physics.AddAcceleration(transform.up);
+        _physics.AddAcceleration(_direction);
         _velocity = _physics.UpdateForces(Time.deltaTime);
         transform.position += (Vector3)(_velocity * Time.deltaTime);
         transform.Rotate(0,0, _spinningTurn * Time.deltaTime * _spinningSpeed );
     }
 
+    public void SetDirection(Vector3 direction)
+    {
+        _direction = direction;
+    } 
+
     public void Die()
     {
-        _signalBus.Fire(new AsteroidDeadSignal(){Asteroid = this});
+        Dead?.Invoke(this);
     }
 }

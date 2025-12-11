@@ -27,7 +27,7 @@ namespace DefaultNamespace
 
             if (other.TryGetComponent(out Asteroid asteroid))
             {
-                _signalBus.Fire(new AsteroidDeadSignal(){Asteroid = asteroid});
+                asteroid.Die();
             }
 
             if (other.TryGetComponent(out UFO ufo))

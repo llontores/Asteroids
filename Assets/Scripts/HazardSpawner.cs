@@ -32,18 +32,11 @@ public class HazardSpawner : MonoBehaviour
     {
         UFOPool = new ObjectPool<UFO>(_ufoCapacity, _ufoPrefab, _ufoContainer);
         AsteroidsPool = new ObjectPool<Asteroid>(_asteroidsCapacity, _asteroidPrefab, _asteroidContainer);
-        _signalBus = signalBus;
-    }
-
-    private void OnEnable()
-    {
-        _signalBus.Subscribe<AsteroidDeadSignal>(ReturnAsteroidToPool);
     }
 
     private void OnDisable()
     {
         _isSpawning = false;
-        _signalBus.Unsubscribe<AsteroidDeadSignal>(ReturnAsteroidToPool);
     }
 
     private void Start()
@@ -58,7 +51,7 @@ public class HazardSpawner : MonoBehaviour
         while (_isSpawning && !token.IsCancellationRequested)
         {
             SpawnOne();
-            
+                
             int cooldown = Random.Range(_minCoolDown, _maxCoolDown + 1);
             await UniTask.Delay(cooldown, cancellationToken: token);
         }
@@ -82,6 +75,8 @@ public class HazardSpawner : MonoBehaviour
             if (AsteroidsPool.TryGetObject(out var asteroid))
             {
                 PlaceAndActivate(asteroid.transform, spawnPoint);
+                asteroid.SetDirection(spawnPoint.up);
+                asteroid.Dead += ReturnAsteroidToPool;
             }
         }
     }
@@ -93,9 +88,10 @@ public class HazardSpawner : MonoBehaviour
         hazard.gameObject.SetActive(true);
     }
 
-    public void ReturnAsteroidToPool(AsteroidDeadSignal args)
+    public void ReturnAsteroidToPool(Asteroid asteroid)
     {
-        AsteroidsPool.ReturnObject(args.Asteroid);
+        asteroid.Dead -= ReturnAsteroidToPool;
+        AsteroidsPool.ReturnObject(asteroid);
     }
 
     public void ReturnUFOToPool(UFO returnedUFO)

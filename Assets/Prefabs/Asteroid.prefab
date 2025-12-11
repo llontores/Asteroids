@@ -103,8 +103,8 @@ MonoBehaviour:
   _drag: 0
   _maxSpeed: 6
   _reward: 0
-  _speeningMinSpeed: 0
-  _speeningMaxSpeed: 0
+  _spinningMinSpeed: 100
+  _spinningMaxSpeed: 200
 --- !u!50 &-9125575188213845707
 Rigidbody2D:
   serializedVersion: 4
