@@ -1,9 +1,9 @@
 ﻿using DefaultNamespace;
 using UnityEngine;
 
-public class UFO : MonoBehaviour, IShootable
+public class UFO : MonoBehaviour, IDestroyable
 {
-    public void Die()
+    public void Destroy(DestroyReason reason)
     {
         throw new System.NotImplementedException();
     }

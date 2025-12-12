@@ -153,7 +153,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b133800abe6445f1bce9b8eed691f9ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _hazardSpawner: {fileID: 0}
 --- !u!61 &155156608
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -248,7 +247,8 @@ MonoBehaviour:
   _spawnPoints:
   - {fileID: 1537645882}
   - {fileID: 1254559520}
-  _ufoCapacity: 20
+  _fragmentsPool: {fileID: 1266381315}
+  _ufoCapacity: 10
   _ufoPrefab: {fileID: 8963031778390121647, guid: 137cec28d36f8414ea362c0efb9bf441, type: 3}
   _ufoContainer: {fileID: 1601720354}
   _asteroidsCapacity: 10
@@ -630,6 +630,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 218693364}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 135}
+--- !u!1 &1266381314
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1266381316}
+  - component: {fileID: 1266381315}
+  m_Layer: 0
+  m_Name: FragmentsPool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1266381315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266381314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 445777c738264053bb346335e07ea717, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _fragmentPrefab: {fileID: 1134801146294726506, guid: 4c320ae5a1b000540a86a3b4a398cb5d, type: 3}
+  _capacity: 10
+--- !u!4 &1266381316
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266381314}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 10.81, y: -1.4212726, z: 0.9281816}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1537645881
 GameObject:
   m_ObjectHideFlags: 0
@@ -1041,3 +1087,4 @@ SceneRoots:
   - {fileID: 218693364}
   - {fileID: 2058280045}
   - {fileID: 1601720354}
+  - {fileID: 1266381316}

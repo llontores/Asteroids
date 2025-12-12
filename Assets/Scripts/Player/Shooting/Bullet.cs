@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Bullet : MonoBehaviour
+public class Bullet : MonoBehaviour, IDestroyable
 {
     [SerializeField] private float _maxSpeed;
     [SerializeField] private float _thrust;
@@ -32,13 +32,14 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.TryGetComponent(out IShootable shootable))
+        if (collision.TryGetComponent(out IDestroyable shootable))
         {
-            shootable.Die();
+            shootable.Destroy(DestroyReason.Bullet);
+            OnBulletDestroyed?.Invoke(this);
         }
     }
 
-    public void Destroy()
+    public void Destroy(DestroyReason reason)
     {
         OnBulletDestroyed?.Invoke(this);
     }

@@ -32,7 +32,6 @@ public class Physics
 
     public void AddAcceleration(Vector2 forward)
     {
-
         _acceleration += forward *  _thrust;
     }
     

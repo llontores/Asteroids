@@ -1,32 +1,31 @@
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class FragmentsPool : MonoBehaviour
 {
     [SerializeField] private Fragment _fragmentPrefab;
     [SerializeField] private int _capacity;
     
-    private ObjectPool<Fragment> _asteroidPool;
+    private ObjectPool<Fragment> _fragmentsPool;
 
     private void Start()
     {
-        _asteroidPool = new ObjectPool<Fragment>(_capacity, _fragmentPrefab, transform);
+        _fragmentsPool = new ObjectPool<Fragment>(_capacity, _fragmentPrefab, transform);
     }
 
     public Fragment GetFragment()
     {
-        if (_asteroidPool.TryGetObject(out Fragment fragment))
+        if (_fragmentsPool.TryGetObject(out Fragment fragment))
         {
-            fragment.OnDestroy += OnDestroy;
+            fragment.OnDestroy += ReturnFragmentToPool;
             return fragment;
         }
 
         return null;
     }
 
-    private void OnDestroy(Fragment fragment)
+    private void ReturnFragmentToPool(Fragment fragment)
     {
-        fragment.OnDestroy -= OnDestroy;
-        _asteroidPool.ReturnObject(fragment);
+        fragment.OnDestroy -= ReturnFragmentToPool;
+        _fragmentsPool.ReturnObject(fragment);
     }
 }
