@@ -75,9 +75,8 @@ public class Asteroid : MonoBehaviour, IDestroyable
         for (int i = 0; i < _fragmentsAmount; i++)
         {
             _spawnedFragment = _fragmentsPool.GetFragment();
+            _spawnedFragment.transform.position = transform.position;
+            _spawnedFragment.gameObject.SetActive(true);
         }
-
-        _spawnedFragment.transform.position = transform.position;
-        _spawnedFragment.gameObject.SetActive(true);
     }
 }

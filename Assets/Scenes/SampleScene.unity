@@ -842,7 +842,7 @@ MonoBehaviour:
   _thrust: 15
   _dragForce: 1.5
   _maxSpeed: 10
-  _turnSpeed: 180
+  _turnSpeed: 360
   _animator: {fileID: 2025016355}
   _renderer: {fileID: 2025016352}
   _shootPoint: {fileID: 524782334}
