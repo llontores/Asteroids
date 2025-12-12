@@ -1,6 +1,4 @@
-﻿using System;
-using Cysharp.Threading.Tasks;
-using Signals;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 using Random = UnityEngine.Random;
@@ -10,6 +8,7 @@ public class HazardSpawner : MonoBehaviour
     [SerializeField] private int _minCoolDown;
     [SerializeField] private int _maxCoolDown;
     [SerializeField] private Transform[] _spawnPoints;
+    [SerializeField] private FragmentsPool _fragmentsPool;
     
     [Header("UFO Pool")]
     [SerializeField] private int _ufoCapacity;
@@ -26,12 +25,19 @@ public class HazardSpawner : MonoBehaviour
 
     private bool _isSpawning = true;
     private SignalBus _signalBus;
+    
 
     [Inject]
     public void Construct(SignalBus signalBus)
     {
         UFOPool = new ObjectPool<UFO>(_ufoCapacity, _ufoPrefab, _ufoContainer);
         AsteroidsPool = new ObjectPool<Asteroid>(_asteroidsCapacity, _asteroidPrefab, _asteroidContainer);
+
+        for (int i = 0; i < _asteroidContainer.childCount; i++)
+        {
+            Asteroid spawned = _asteroidContainer.GetChild(i).GetComponent<Asteroid>();
+            spawned.Init(_fragmentsPool);
+        }
     }
 
     private void OnDisable()

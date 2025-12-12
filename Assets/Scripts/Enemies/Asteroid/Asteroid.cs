@@ -25,6 +25,9 @@ public class Asteroid : MonoBehaviour, IShootable
     private Physics _physics;
     private Vector3 _direction;
     private ObjectPool<Fragment> _asteroidPool;
+    private FragmentsPool _fragmentsPool;
+    private int _fragmentsAmount;
+    private Fragment _spawnedFragment;
     
     private void Start()
     {
@@ -38,7 +41,6 @@ public class Asteroid : MonoBehaviour, IShootable
         _velocity = Vector2.zero;
     }
     
-
     public void Update()
     {
         _physics.AddAcceleration(_direction);
@@ -47,6 +49,11 @@ public class Asteroid : MonoBehaviour, IShootable
         transform.Rotate(0,0, _spinningTurn * Time.deltaTime * _spinningSpeed );
     }
 
+    public void Init(FragmentsPool pool)
+    {
+        _fragmentsPool = pool;
+    }
+    
     public void SetDirection(Vector3 direction)
     {
         _direction = direction;
@@ -54,6 +61,13 @@ public class Asteroid : MonoBehaviour, IShootable
 
     public void Die()
     {
+        _fragmentsAmount = Random.Range(_minFragmentAmount, _maxFragmentAmount);
+
+        for (int i = 0; i < _fragmentsAmount; i++)
+        {
+            _spawnedFragment = _fragmentsPool.GetFragment();
+        }
+        
         OnDead?.Invoke(this);
     }
 }
