@@ -14,6 +14,9 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform _shootPoint;
     [SerializeField] private int _bulletsShootCooldown;
     [SerializeField] private Bullet  _bulletPrefab;
+    [SerializeField] private float _laserDuration;
+    [SerializeField] private float _maxRayDistance;
+    [SerializeField] private LineRenderer _lineRenderer;
     
     public float TurnSpeed => _turnSpeed;
     public float Thrust => _thrust;
@@ -24,4 +27,7 @@ public class Player : MonoBehaviour
     public Transform ShootPoint => _shootPoint;
     public int BulletsShootCooldown => _bulletsShootCooldown;
     public Bullet BulletPrefab => _bulletPrefab;
+    public float  LaserDuration => _laserDuration;
+    public float  MaxRayDistance => _maxRayDistance;
+    public LineRenderer LineRenderer => _lineRenderer;
 }

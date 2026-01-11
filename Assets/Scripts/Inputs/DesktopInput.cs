@@ -38,7 +38,7 @@ namespace Inputs
             if(Input.GetMouseButtonDown(0)) 
                 _signalBus.Fire(new BulletShootSignal());
             
-            if (Input.GetMouseButton(1))
+            if (Input.GetMouseButtonDown(1))
                 _signalBus.Fire(new LaserShootSignal());
         }
     }

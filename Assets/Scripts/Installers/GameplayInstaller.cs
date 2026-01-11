@@ -13,6 +13,7 @@ public class GameplayInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<PlayerView>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<ScreenWrapper>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<PlayerShooter>().AsSingle().NonLazy();
+        //Container.BindInterfacesAndSelfTo<Laser>().AsSingle().NonLazy();
         Container.Bind<BulletsContainer>().FromComponentInHierarchy().AsSingle();
         Container.Bind<WorldSpace>().FromComponentInHierarchy().AsSingle();
         
@@ -22,5 +23,6 @@ public class GameplayInstaller : MonoInstaller
         Container.DeclareSignal<TurnSignal>();
         Container.DeclareSignal<BulletShootSignal>();
         Container.DeclareSignal<AccelerationSignal>();
+        Container.DeclareSignal<LaserShootSignal>();
     }
 }

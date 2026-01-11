@@ -1,15 +1,12 @@
-﻿using Signals;
-using UnityEngine;
-using Zenject;
+﻿using UnityEngine;
 
-
-    public class WorldSpace : MonoBehaviour
+public class WorldSpace : MonoBehaviour
+{
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        private void OnTriggerExit2D(Collider2D other)
+        if (other.TryGetComponent(out IDestroyable destroyable))
         {
-            if (other.TryGetComponent(out IDestroyable destroyable))
-            {
-                destroyable.Destroy(DestroyReason.World);
-            }
+            destroyable.Destroy(DestroyReason.World);
         }
     }
+}
