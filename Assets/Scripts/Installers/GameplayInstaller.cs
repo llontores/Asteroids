@@ -13,7 +13,7 @@ public class GameplayInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<PlayerView>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<ScreenWrapper>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<PlayerShooter>().AsSingle().NonLazy();
-        //Container.BindInterfacesAndSelfTo<Laser>().AsSingle().NonLazy();
+        Container.BindInterfacesAndSelfTo<Laser>().AsSingle().NonLazy();
         Container.Bind<BulletsContainer>().FromComponentInHierarchy().AsSingle();
         Container.Bind<WorldSpace>().FromComponentInHierarchy().AsSingle();
         

@@ -316,7 +316,6 @@ GameObject:
   m_Component:
   - component: {fileID: 326978345}
   - component: {fileID: 326978344}
-  - component: {fileID: 326978346}
   m_Layer: 0
   m_Name: Laser
   m_TagString: Untagged
@@ -371,7 +370,7 @@ LineRenderer:
   - {x: 0, y: 0, z: 1}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1
+    widthMultiplier: 5
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -443,22 +442,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2025016353}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &326978346
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 326978343}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e9ea97579ca42db923ef29755f18332, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxDistance: 50
-  ignoreLayers:
-    serializedVersion: 2
-    m_Bits: 32
 --- !u!1 &360502406
 GameObject:
   m_ObjectHideFlags: 0
