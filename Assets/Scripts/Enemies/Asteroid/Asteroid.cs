@@ -60,7 +60,7 @@ public class Asteroid : MonoBehaviour, IDestroyable
 
     public void Destroy(DestroyReason reason)
     {
-        if (reason == DestroyReason.Bullet)
+        if (reason != DestroyReason.World)
         {
             SpawnFragments();
         }

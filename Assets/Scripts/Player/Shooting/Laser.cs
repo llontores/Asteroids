@@ -1,20 +1,24 @@
 ﻿using System;
-using System.Threading; // Нужно для CancellationToken
-using Cysharp.Threading.Tasks; // Подключаем UniTask
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Signals;
 using UnityEngine;
 using Zenject;
 
-public class Laser : IInitializable, IDisposable 
+public class Laser : IInitializable, IDisposable
 {
     private SignalBus _signalBus;
     private float _maxDistance;
     private Transform _shootPoint;
     private LineRenderer _lineRenderer;
     private float _laserDuration;
+    private LayerMask _layerMaskIgnore;
+    private float _cooldown;
+    private float _lastShootTime;
 
-    // Токен для отмены текущего выстрела (если выстрелим снова или объект умрет)
     private CancellationTokenSource _shootCts;
+
+    private readonly RaycastHit2D[] _hitsBuffer = new RaycastHit2D[10];
 
     [Inject]
     public void Construct(SignalBus signalBus, Player player)
@@ -22,90 +26,100 @@ public class Laser : IInitializable, IDisposable
         _signalBus = signalBus;
         _lineRenderer = player.LineRenderer;
         _maxDistance = player.MaxRayDistance;
-        _shootPoint = player.ShootPoint; 
+        _shootPoint = player.ShootPoint;
         _laserDuration = player.LaserDuration;
+        _layerMaskIgnore = player.LayerMaskIgnore;
+        _cooldown = player.LaserCooldown;
         
-        // Сразу скрываем лазер при старте
-        if(_lineRenderer != null) _lineRenderer.enabled = false;
+        if (_lineRenderer != null) _lineRenderer.enabled = false;
+
+        _lastShootTime = -_cooldown; 
     }
 
-    // Этот метод запускается при получении сигнала
     private void ShootLaser()
     {
-        // Запускаем асинхронную операцию и "забываем" о ней (fire and forget)
         ShootLaserRoutine().Forget();
     }
 
     private async UniTaskVoid ShootLaserRoutine()
     {
-        // 1. Отменяем предыдущий выстрел, если он еще идет
+        if (Time.time < _lastShootTime + _cooldown)
+            return;
+
         if (_shootCts != null)
         {
             _shootCts.Cancel();
             _shootCts.Dispose();
         }
-        
-        // Создаем новый токен для текущего выстрела
+
+        _lastShootTime = Time.time;
         _shootCts = new CancellationTokenSource();
         var token = _shootCts.Token;
 
         try
         {
-            // 2. Включаем лазер
             _lineRenderer.enabled = true;
 
             float startTime = Time.time;
 
-            // 3. Цикл: пока не прошло нужное время
             while (Time.time < startTime + _laserDuration)
             {
-                UpdateLaser(); // Обновляем позицию луча
-
-                // Ждем следующего кадра (аналог yield return null)
-                // Передаем token, чтобы прервать ожидание, если выстрел отменили
-                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken: token);
+                UpdateLaser();
+                await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
         }
         catch (OperationCanceledException)
         {
-            // Сюда попадем, если выстрел был прерван новым выстрелом или Dispose
-            // Можно ничего не делать, просто выходим
+
         }
         finally
         {
-            // 4. Блок finally выполнится ВСЕГДА: и при успешном завершении, 
-            // и при ошибке, и при отмене. Тут выключаем лазер.
-            if (_lineRenderer != null) 
+            if (_lineRenderer != null)
                 _lineRenderer.enabled = false;
-            
-            // Очищаем токен
+
             if (_shootCts != null)
             {
-                 _shootCts.Dispose();
-                 _shootCts = null;
+                _shootCts.Dispose();
+                _shootCts = null;
             }
         }
     }
 
     private void UpdateLaser()
     {
-        // Этот код остается без изменений, он просто считает физику
         Vector2 origin = _shootPoint.position;
-        Vector2 direction = _shootPoint.up; 
+        Vector2 direction = _shootPoint.up;
 
-        RaycastHit2D hit = Physics2D.Raycast(origin, direction, _maxDistance);
+        int hitCount = Physics2D.RaycastNonAlloc(origin, direction, _hitsBuffer, _maxDistance, ~_layerMaskIgnore);
 
         Vector2 endPoint;
-        if (hit.collider != null)
+
+        if (hitCount > 0)
         {
-            endPoint = hit.point;
+            float maxDistFound = -1f;
+            Vector2 furthestPoint = origin;
+
+            for (int i = 0; i < hitCount; i++)
+            {
+                var hit = _hitsBuffer[i];
+
+                if (hit.distance > maxDistFound)
+                {
+                    maxDistFound = hit.distance;
+                    furthestPoint = hit.point;
+                }
+
+                hit.collider.GetComponent<IDestroyable>()?.Destroy(DestroyReason.Laser);
+            }
+
+            endPoint = furthestPoint;
         }
         else
         {
             endPoint = origin + (direction * _maxDistance);
         }
 
-        _lineRenderer.SetPosition(0, new Vector3(origin.x,origin.y, -0.1f));
+        _lineRenderer.SetPosition(0, new Vector3(origin.x, origin.y, -0.1f));
         _lineRenderer.SetPosition(1, new Vector3(endPoint.x, endPoint.y, -0.1f));
     }
 
@@ -116,14 +130,8 @@ public class Laser : IInitializable, IDisposable
 
     public void Dispose()
     {
-        _signalBus.Unsubscribe<LaserShootSignal>(ShootLaser);
-        
-        // ВАЖНО: Если игрок вышел или объект удаляется, отменяем активную задачу,
-        // иначе UniTask продолжит работать и попытается обратиться к удаленному LineRenderer.
-        if (_shootCts != null)
-        {
-            _shootCts.Cancel();
-            _shootCts.Dispose();
-        }
+        _signalBus.TryUnsubscribe<LaserShootSignal>(ShootLaser);
+        _shootCts?.Cancel();
+        _shootCts?.Dispose();
     }
 }

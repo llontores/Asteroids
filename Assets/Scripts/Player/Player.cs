@@ -17,6 +17,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float _laserDuration;
     [SerializeField] private float _maxRayDistance;
     [SerializeField] private LineRenderer _lineRenderer;
+    [SerializeField] private LayerMask _layerMaskIgnore;
+    [SerializeField] private float _laserCooldown;
     
     public float TurnSpeed => _turnSpeed;
     public float Thrust => _thrust;
@@ -30,4 +32,6 @@ public class Player : MonoBehaviour
     public float  LaserDuration => _laserDuration;
     public float  MaxRayDistance => _maxRayDistance;
     public LineRenderer LineRenderer => _lineRenderer;
+    public LayerMask LayerMaskIgnore => _layerMaskIgnore;
+    public float LaserCooldown => _laserCooldown;
 }

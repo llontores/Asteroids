@@ -1,5 +1,6 @@
 ﻿public enum DestroyReason
 {
     Bullet,
-    World
+    World,
+    Laser
 }
