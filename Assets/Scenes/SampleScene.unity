@@ -370,7 +370,7 @@ LineRenderer:
   - {x: 0, y: 0, z: 1}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1
+    widthMultiplier: 0.1
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -603,7 +603,7 @@ Transform:
   m_GameObject: {fileID: 524782333}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.675, z: 0}
+  m_LocalPosition: {x: 0, y: 0.7419, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1200,12 +1200,13 @@ MonoBehaviour:
   _shootPoint: {fileID: 524782334}
   _bulletsShootCooldown: 100
   _bulletPrefab: {fileID: 6943053254885196363, guid: 1912585857496354c9a09125728e1796, type: 3}
-  _laserDuration: 5
+  _laserDuration: 0.1
   _maxRayDistance: 100
   _lineRenderer: {fileID: 326978344}
   _layerMaskIgnore:
     serializedVersion: 2
     m_Bits: 64
+  _laserCooldown: 3
 --- !u!95 &2025016355
 Animator:
   serializedVersion: 5
