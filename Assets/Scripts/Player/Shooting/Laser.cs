@@ -15,8 +15,13 @@ public class Laser : IInitializable, IDisposable
     private LayerMask _layerMaskIgnore;
     private float _cooldown;
     private float _lastShootTime;
+    private float _currentAmmoCount;
+    private float _maxAmmoCount;
+    private float _ammoReloadCooldown;
 
     private CancellationTokenSource _shootCts;
+    private CancellationTokenSource _reloadCts;
+    
 
     private readonly RaycastHit2D[] _hitsBuffer = new RaycastHit2D[10];
 
@@ -30,8 +35,13 @@ public class Laser : IInitializable, IDisposable
         _laserDuration = player.LaserDuration;
         _layerMaskIgnore = player.LayerMaskIgnore;
         _cooldown = player.LaserCooldown;
+        _maxAmmoCount = player.MaxLaserAmmoCount;
+        _currentAmmoCount = _maxAmmoCount;
+        _ammoReloadCooldown = player.LaserReloadCooldown;
+        _reloadCts = new CancellationTokenSource();
         
-        if (_lineRenderer != null) _lineRenderer.enabled = false;
+        if (_lineRenderer != null) 
+            _lineRenderer.enabled = false;
 
         _lastShootTime = -_cooldown; 
     }
@@ -43,7 +53,7 @@ public class Laser : IInitializable, IDisposable
 
     private async UniTaskVoid ShootLaserRoutine()
     {
-        if (Time.time < _lastShootTime + _cooldown)
+        if (Time.time < _lastShootTime + _cooldown || _currentAmmoCount == 0)
             return;
 
         if (_shootCts != null)
@@ -52,6 +62,8 @@ public class Laser : IInitializable, IDisposable
             _shootCts.Dispose();
         }
 
+        _currentAmmoCount = Mathf.Clamp(_currentAmmoCount - 1, 0, _maxAmmoCount);
+        ReloadLaserAmmo().Forget();
         _lastShootTime = Time.time;
         _shootCts = new CancellationTokenSource();
         var token = _shootCts.Token;
@@ -69,8 +81,7 @@ public class Laser : IInitializable, IDisposable
             }
         }
         catch (OperationCanceledException)
-        {
-
+        { 
         }
         finally
         {
@@ -83,6 +94,19 @@ public class Laser : IInitializable, IDisposable
                 _shootCts = null;
             }
         }
+    }
+
+    private async UniTaskVoid ReloadLaserAmmo()
+    {
+        float elapsedTIme = 0;
+        
+        while (elapsedTIme < _ammoReloadCooldown)
+        {
+            elapsedTIme += Time.deltaTime;
+            await UniTask.Yield(PlayerLoopTiming.Update, _reloadCts.Token);
+        }
+        
+        _currentAmmoCount = Mathf.Clamp(_currentAmmoCount + 1, 0, _maxAmmoCount);
     }
 
     private void UpdateLaser()
@@ -133,5 +157,7 @@ public class Laser : IInitializable, IDisposable
         _signalBus.TryUnsubscribe<LaserShootSignal>(ShootLaser);
         _shootCts?.Cancel();
         _shootCts?.Dispose();
+        _reloadCts?.Cancel();
+        _reloadCts?.Dispose();
     }
 }

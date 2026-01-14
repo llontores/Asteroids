@@ -1206,7 +1206,9 @@ MonoBehaviour:
   _layerMaskIgnore:
     serializedVersion: 2
     m_Bits: 64
-  _laserCooldown: 3
+  _laserCooldown: 0.3
+  _maxLaserAmmoCount: 3
+  _laserReloadCooldown: 10
 --- !u!95 &2025016355
 Animator:
   serializedVersion: 5

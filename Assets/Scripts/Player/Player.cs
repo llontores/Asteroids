@@ -19,6 +19,8 @@ public class Player : MonoBehaviour
     [SerializeField] private LineRenderer _lineRenderer;
     [SerializeField] private LayerMask _layerMaskIgnore;
     [SerializeField] private float _laserCooldown;
+    [SerializeField] private float _maxLaserAmmoCount;
+    [SerializeField] private float _laserReloadCooldown;
     
     public float TurnSpeed => _turnSpeed;
     public float Thrust => _thrust;
@@ -34,4 +36,6 @@ public class Player : MonoBehaviour
     public LineRenderer LineRenderer => _lineRenderer;
     public LayerMask LayerMaskIgnore => _layerMaskIgnore;
     public float LaserCooldown => _laserCooldown;
+    public float MaxLaserAmmoCount => _maxLaserAmmoCount;
+    public float LaserReloadCooldown => _laserReloadCooldown;
 }
