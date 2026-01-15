@@ -25,11 +25,13 @@ public class HazardSpawner : MonoBehaviour
 
     private bool _isSpawning = true;
     private SignalBus _signalBus;
+    private Transform _target;
     
 
     [Inject]
-    public void Construct(SignalBus signalBus)
+    public void Construct(SignalBus signalBus, Player player)
     {
+        _target = player.transform;
         UFOPool = new ObjectPool<UFO>(_ufoCapacity, _ufoPrefab, _ufoContainer);
         AsteroidsPool = new ObjectPool<Asteroid>(_asteroidsCapacity, _asteroidPrefab, _asteroidContainer);
 
@@ -71,9 +73,11 @@ public class HazardSpawner : MonoBehaviour
 
         if (spawnUfo)
         {
-            if (UFOPool.TryGetObject(out var ufo))
+            if (UFOPool.TryGetObject(out UFO ufo))
             {
                 PlaceAndActivate(ufo.transform, spawnPoint);
+                ufo.InitTarget(_target);
+                ufo.OnDestroy += ReturnUFOToPool;
             }
         }
         else
@@ -102,6 +106,7 @@ public class HazardSpawner : MonoBehaviour
 
     public void ReturnUFOToPool(UFO returnedUFO)
     {
+        returnedUFO.OnDestroy -= ReturnUFOToPool;
         UFOPool.ReturnObject(returnedUFO);
     }
 }

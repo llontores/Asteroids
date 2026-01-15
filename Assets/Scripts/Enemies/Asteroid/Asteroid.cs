@@ -67,6 +67,17 @@ public class Asteroid : MonoBehaviour, IDestroyable
 
         OnDead?.Invoke(this);
     }
+    
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.TryGetComponent(out Player player))
+        {
+            Vector2 contactPoint = other.ClosestPoint(transform.position);
+            Vector2 normal = ((Vector2)transform.position - contactPoint).normalized;
+
+            _physics.Bounce(normal);
+        }
+    }
 
     private void SpawnFragments()
     {

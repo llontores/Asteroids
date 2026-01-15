@@ -30,12 +30,12 @@ public class Physics
         return Velocity;
     }
 
-    public void AddAcceleration(Vector2 forward)
+    public void AddAcceleration(Vector2 forward)    
     {
         _acceleration += forward *  _thrust;
     }
     
-    public void Bounce(Vector2 collidedObjectPosition, float bounciness = 0.8f)
+    public void Bounce(Vector2 collidedObjectPosition, float bounciness = 10)
     {
         collidedObjectPosition = collidedObjectPosition.normalized;
         Velocity = Velocity - 2f * Vector2.Dot(Velocity, collidedObjectPosition) * collidedObjectPosition;

@@ -282,6 +282,8 @@ MonoBehaviour:
   _spawnPoints:
   - {fileID: 1537645882}
   - {fileID: 1254559520}
+  - {fileID: 1861761810}
+  - {fileID: 1177762916}
   _fragmentsPool: {fileID: 1266381315}
   _ufoCapacity: 10
   _ufoPrefab: {fileID: 8963031778390121647, guid: 137cec28d36f8414ea362c0efb9bf441, type: 3}
@@ -303,7 +305,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1537645882}
+  - {fileID: 1861761810}
   - {fileID: 1254559520}
+  - {fileID: 1177762916}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &326978343
@@ -866,6 +870,37 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 23.911167, y: 1.7458568}
   m_EdgeRadius: 0
+--- !u!1 &1177762915
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1177762916}
+  m_Layer: 0
+  m_Name: SpawnPoint (3)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1177762916
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1177762915}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: 0.33328968, w: 0.9428245}
+  m_LocalPosition: {x: 9.2, y: -5.04, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 218693364}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 38.937}
 --- !u!1 &1231049344
 GameObject:
   m_ObjectHideFlags: 0
@@ -1089,6 +1124,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1861761809
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1861761810}
+  m_Layer: 0
+  m_Name: SpawnPoint (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1861761810
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1861761809}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.93315697, w: 0.35946935}
+  m_LocalPosition: {x: -9.12, y: 4.9, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 218693364}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -137.865}
 --- !u!1 &2025016350
 GameObject:
   m_ObjectHideFlags: 0

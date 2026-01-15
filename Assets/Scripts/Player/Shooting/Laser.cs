@@ -72,11 +72,12 @@ public class Laser : IInitializable, IDisposable
         {
             _lineRenderer.enabled = true;
 
-            float startTime = Time.time;
+            float elapsedTime = 0;
 
-            while (Time.time < startTime + _laserDuration)
+            while (elapsedTime < _laserDuration)
             {
                 UpdateLaser();
+                elapsedTime += Time.deltaTime;
                 await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
         }
