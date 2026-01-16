@@ -102,6 +102,7 @@ MonoBehaviour:
   _impulceForce: 300
   _dragForce: 0.15
   _maxSpeed: 300
+  _bounceForce: 5
 --- !u!61 &1237127653076654871
 BoxCollider2D:
   m_ObjectHideFlags: 0

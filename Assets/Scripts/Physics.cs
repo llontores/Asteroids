@@ -7,12 +7,14 @@ public class Physics
     private float _thrust;
     private float _dragForce;
     private float _maxSpeed;
+    private float _bounceForce;
 
-    public Physics(float thrust, float dragForce, float maxSpeed)
+    public Physics(float thrust, float dragForce, float maxSpeed,  float bounceForce)
     {
         _thrust = thrust;
         _dragForce = dragForce;
         _maxSpeed = maxSpeed;
+        _bounceForce = bounceForce;
     }
 
     public Vector2 UpdateForces(float deltaTime)
@@ -35,10 +37,10 @@ public class Physics
         _acceleration += forward *  _thrust;
     }
     
-    public void Bounce(Vector2 collidedObjectPosition, float bounciness = 10)
+    public void Bounce(Vector2 collidedObjectPosition)
     {
         collidedObjectPosition = collidedObjectPosition.normalized;
         Velocity = Velocity - 2f * Vector2.Dot(Velocity, collidedObjectPosition) * collidedObjectPosition;
-        Velocity *= bounciness;
+        Velocity *= _bounceForce;
     }
 }

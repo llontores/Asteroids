@@ -11,6 +11,7 @@ public class Fragment : MonoBehaviour, IDestroyable
     [SerializeField] private float _impulceForce;
     [SerializeField] private float _dragForce;
     [SerializeField] private float _maxSpeed;
+    [SerializeField] private float _bounceForce;
     
     public event UnityAction<Fragment> OnDestroy;
     
@@ -25,7 +26,7 @@ public class Fragment : MonoBehaviour, IDestroyable
 
     private void Awake()
     {
-        _physics = new Physics(_impulceForce, _dragForce, _maxSpeed);
+        _physics = new Physics(_impulceForce, _dragForce, _maxSpeed, _bounceForce);
     }
 
     private void Update()
@@ -37,5 +38,16 @@ public class Fragment : MonoBehaviour, IDestroyable
     public void Destroy(DestroyReason reason)
     {
         OnDestroy?.Invoke(this);
+    }
+    
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.TryGetComponent(out Player player))
+        {
+            Vector2 contactPoint = other.ClosestPoint(transform.position);
+            Vector2 normal = ((Vector2)transform.position - contactPoint).normalized;
+
+            _physics.Bounce(normal);
+        }
     }
 }

@@ -1275,6 +1275,9 @@ MonoBehaviour:
   _laserCooldown: 0.3
   _maxLaserAmmoCount: 3
   _laserReloadCooldown: 10
+  _bounceForce: 5
+  _polygonCollider2D: {fileID: 2025016356}
+  _invelnurabilityDuration: 5000
 --- !u!95 &2025016355
 Animator:
   serializedVersion: 5

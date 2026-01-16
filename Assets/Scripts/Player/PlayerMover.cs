@@ -9,26 +9,30 @@ public class PlayerMover : IInitializable, IDisposable, ITickable
     private float _turnSpeed;
     private Transform _playerTransform;
     private Physics _physics;
+    private Player _player;
 
     [Inject]
     public void Construct(SignalBus signalBus, Player player)
     {
+        _player = player;
         _signalBus = signalBus;
-        _turnSpeed = player.TurnSpeed;
-        _playerTransform = player.transform;
-        _physics = new Physics(player.Thrust, player.DragForce, player.MaxSpeed);
+        _turnSpeed = _player.TurnSpeed;
+        _playerTransform = _player.transform;
+        _physics = new Physics(_player.Thrust, _player.DragForce, _player.MaxSpeed, _player.BounceForce);
     }
 
     public void Initialize()
     {
         _signalBus.Subscribe<AccelerationSignal>(Accelerate);
         _signalBus.Subscribe<TurnSignal>(Turn);
+        _player.OnTriggerEntered += Bounce;
     }
 
     public void Dispose()
     {
         _signalBus.Unsubscribe<AccelerationSignal>(Accelerate);
         _signalBus.Unsubscribe<TurnSignal>(Turn);
+        _player.OnTriggerEntered -= Bounce;
     }
 
     public void Tick()
@@ -47,5 +51,13 @@ public class PlayerMover : IInitializable, IDisposable, ITickable
         int turnIndex = args.TurnIndex;
 
         _playerTransform.Rotate(0, 0, turnIndex * _turnSpeed * Time.deltaTime);
+    }
+
+    private void Bounce(Collider2D other)
+    {
+        Vector2 contactPoint = other.ClosestPoint(_player.transform.position);
+        Vector2 normal = ((Vector2)_player.transform.position - contactPoint).normalized;
+
+        _physics.Bounce(normal);
     }
 }

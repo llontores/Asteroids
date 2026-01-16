@@ -20,7 +20,7 @@ public class Bullet : MonoBehaviour, IDestroyable
 
     private void Awake()
     {
-        _physics = new Physics(_thrust, _dragForce, _maxSpeed);
+        _physics = new Physics(_thrust, _dragForce, _maxSpeed, 0);
     } 
 
     private void Update()

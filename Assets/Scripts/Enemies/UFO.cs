@@ -12,6 +12,7 @@ public class UFO : MonoBehaviour, IDestroyable
     [SerializeField] private float _reward;
     [SerializeField] private float _spinningMinSpeed;
     [SerializeField] private float _spinningMaxSpeed;
+    [SerializeField] private float _bounceForce;
     
     public event UnityAction<UFO> OnDestroy;
     private int _spinningTurn;
@@ -23,7 +24,7 @@ public class UFO : MonoBehaviour, IDestroyable
     
     private void Start()
     {
-        _physics = new Physics(_thrust, _drag, _maxSpeed);
+        _physics = new Physics(_thrust, _drag, _maxSpeed, _bounceForce);
         _spinningSpeed = Random.Range(_spinningMinSpeed, _spinningMaxSpeed + 1);
         _spinningTurn = Random.Range(RightTurnIndex, LeftTurnIndex + 1);
     }

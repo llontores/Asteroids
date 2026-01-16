@@ -15,6 +15,7 @@ public class Asteroid : MonoBehaviour, IDestroyable
     [SerializeField] private float _spinningMaxSpeed;
     [SerializeField] private int _minFragmentAmount;
     [SerializeField] private int _maxFragmentAmount;
+    [SerializeField] private float _bounceForce;
 
     public event UnityAction<Asteroid> OnDead;
 
@@ -30,7 +31,7 @@ public class Asteroid : MonoBehaviour, IDestroyable
 
     private void Start()
     {
-        _physics = new Physics(_thrust, _drag, _maxSpeed);
+        _physics = new Physics(_thrust, _drag, _maxSpeed, _bounceForce);
         _spinningSpeed = Random.Range(_spinningMinSpeed, _spinningMaxSpeed + 1);
         _spinningTurn = Random.Range(RightTurnIndex, LeftTurnIndex + 1);
     }

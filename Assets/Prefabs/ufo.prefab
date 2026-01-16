@@ -53,6 +53,7 @@ MonoBehaviour:
   _reward: 50
   _spinningMinSpeed: 50
   _spinningMaxSpeed: 100
+  _bounceForce: 10
 --- !u!212 &4214624049453490778
 SpriteRenderer:
   m_ObjectHideFlags: 0
