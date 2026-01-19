@@ -12,8 +12,10 @@ public class Fragment : MonoBehaviour, IDestroyable
     [SerializeField] private float _dragForce;
     [SerializeField] private float _maxSpeed;
     [SerializeField] private float _bounceForce;
+    [SerializeField] private int _reward;
     
     public event UnityAction<Fragment> OnDestroy;
+    public int Reward => _reward;
     
     private Physics _physics;
     private Vector2 _velocity;

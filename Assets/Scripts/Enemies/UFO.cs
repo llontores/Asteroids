@@ -9,7 +9,7 @@ public class UFO : MonoBehaviour, IDestroyable
     [SerializeField] private float _thrust;
     [SerializeField] private float _drag;
     [SerializeField] private float _maxSpeed;
-    [SerializeField] private float _reward;
+    [SerializeField] private int _reward;
     [SerializeField] private float _spinningMinSpeed;
     [SerializeField] private float _spinningMaxSpeed;
     [SerializeField] private float _bounceForce;
@@ -21,6 +21,8 @@ public class UFO : MonoBehaviour, IDestroyable
     private Physics _physics;
     private Vector3 _direction;
     private Transform _target;
+    public int Reward => _reward;
+    
     
     private void Start()
     {

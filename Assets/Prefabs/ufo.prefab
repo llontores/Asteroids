@@ -50,7 +50,7 @@ MonoBehaviour:
   _thrust: 20
   _drag: 0
   _maxSpeed: 6
-  _reward: 50
+  _reward: 7
   _spinningMinSpeed: 50
   _spinningMaxSpeed: 100
   _bounceForce: 10

@@ -1,20 +1,26 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
+using Zenject;
 
-public class FragmentsPool : MonoBehaviour
+public class FragmentsPool : ObjectPool<Fragment>
 {
-    [SerializeField] private Fragment _fragmentPrefab;
-    [SerializeField] private int _capacity;
-    
-    private ObjectPool<Fragment> _fragmentsPool;
+    private RewardCounter _rewardCounter;
+    private UnityAction<int> _rewardableDied;
 
-    private void Start()
+    [Inject]
+    public void Construct(RewardCounter rewardCounter)
     {
-        _fragmentsPool = new ObjectPool<Fragment>(_capacity, _fragmentPrefab, transform);
+        _rewardCounter = rewardCounter;
+    }
+    
+    public FragmentsPool(int capacity, Fragment prefab, Transform container, UnityAction<int> rewardableDied) : base(capacity, prefab, container)
+    {
+        _rewardableDied = rewardableDied;
     }
 
     public Fragment GetFragment()
     {
-        if (_fragmentsPool.TryGetObject(out Fragment fragment))
+        if (TryGetObject(out Fragment fragment))
         {
             fragment.OnDestroy += ReturnFragmentToPool;
             return fragment;
@@ -26,6 +32,7 @@ public class FragmentsPool : MonoBehaviour
     private void ReturnFragmentToPool(Fragment fragment)
     {
         fragment.OnDestroy -= ReturnFragmentToPool;
-        _fragmentsPool.ReturnObject(fragment);
+        _rewardableDied?.Invoke(fragment.Reward);
+        ReturnObject(fragment);
     }
 }

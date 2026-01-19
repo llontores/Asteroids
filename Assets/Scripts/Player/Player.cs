@@ -1,4 +1,5 @@
-﻿using DefaultNamespace;
+﻿using System;
+using DefaultNamespace;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
@@ -27,6 +28,10 @@ public class Player : MonoBehaviour
     [SerializeField] private float _bounceForce;
     [SerializeField] private PolygonCollider2D _polygonCollider2D;
     [SerializeField] private int _invelnurabilityDuration;
+    [SerializeField] private int _invulnerabilityCoolDown;
+    [SerializeField] private int _maxHealth;
+    
+    private int _currentHealth;
 
     public event UnityAction<Collider2D> OnTriggerEntered;
     public float TurnSpeed => _turnSpeed;
@@ -48,10 +53,25 @@ public class Player : MonoBehaviour
     public float BounceForce => _bounceForce;
     public PolygonCollider2D PolygonCollider2D => _polygonCollider2D;
     public int InvulnerabilityDuration => _invelnurabilityDuration;
+    public int InvulnerabilityCoolDown => _invulnerabilityCoolDown;
+    public bool IsInvulnerable { get; private set; }
+
+    private void Start()
+    {
+        _currentHealth =  _maxHealth;
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!collision.TryGetComponent<Bullet>(out Bullet bullet))
+        {
             OnTriggerEntered?.Invoke(collision);
+            _currentHealth = Mathf.Clamp(_currentHealth - 1, 0, _maxHealth);
+        }
+    }
+
+    public void ChangeInvelnurabilityStatus(bool status)
+    {
+        IsInvulnerable = status;
     }
 }

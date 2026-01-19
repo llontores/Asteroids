@@ -102,7 +102,7 @@ MonoBehaviour:
   _thrust: 20
   _drag: 0
   _maxSpeed: 6
-  _reward: 0
+  _reward: 5
   _spinningMinSpeed: 100
   _spinningMaxSpeed: 200
   _minFragmentAmount: 2

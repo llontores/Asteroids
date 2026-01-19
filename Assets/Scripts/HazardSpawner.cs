@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Events;
 using Zenject;
 using Random = UnityEngine.Random;
 
@@ -8,7 +9,6 @@ public class HazardSpawner : MonoBehaviour
     [SerializeField] private int _minCoolDown;
     [SerializeField] private int _maxCoolDown;
     [SerializeField] private Transform[] _spawnPoints;
-    [SerializeField] private FragmentsPool _fragmentsPool;
     
     [Header("UFO Pool")]
     [SerializeField] private int _ufoCapacity;
@@ -19,21 +19,29 @@ public class HazardSpawner : MonoBehaviour
     [SerializeField] private int _asteroidsCapacity;
     [SerializeField] private Asteroid _asteroidPrefab;
     [SerializeField] private Transform _asteroidContainer;
+    
+    [Header("Fragments Pool")]
+    [SerializeField] private int _fragmentsPoolCapacity;
+    [SerializeField] private Fragment _fragmentPrefab;
+    [SerializeField] private Transform _fragmentContainer;
 
-    public ObjectPool<UFO> UFOPool { get; private set; }
-    public ObjectPool<Asteroid> AsteroidsPool{get; private set;}
-
+    public event UnityAction<int> RewardableDied;
+    
+    private ObjectPool<UFO> _ufoPool;
+    private ObjectPool<Asteroid> _asteroidsPool;
+    private FragmentsPool _fragmentsPool;
     private bool _isSpawning = true;
     private SignalBus _signalBus;
     private Transform _target;
     
 
     [Inject]
-    public void Construct(SignalBus signalBus, Player player)
+    public void Construct(Player player)
     {
         _target = player.transform;
-        UFOPool = new ObjectPool<UFO>(_ufoCapacity, _ufoPrefab, _ufoContainer);
-        AsteroidsPool = new ObjectPool<Asteroid>(_asteroidsCapacity, _asteroidPrefab, _asteroidContainer);
+        _ufoPool = new ObjectPool<UFO>(_ufoCapacity, _ufoPrefab, _ufoContainer);
+        _asteroidsPool = new ObjectPool<Asteroid>(_asteroidsCapacity, _asteroidPrefab, _asteroidContainer);
+        _fragmentsPool = new FragmentsPool(_fragmentsPoolCapacity, _fragmentPrefab, _fragmentContainer, RewardableDied);
 
         for (int i = 0; i < _asteroidContainer.childCount; i++)
         {
@@ -73,7 +81,7 @@ public class HazardSpawner : MonoBehaviour
 
         if (spawnUfo)
         {
-            if (UFOPool.TryGetObject(out UFO ufo))
+            if (_ufoPool.TryGetObject(out UFO ufo))
             {
                 PlaceAndActivate(ufo.transform, spawnPoint);
                 ufo.InitTarget(_target);
@@ -82,7 +90,7 @@ public class HazardSpawner : MonoBehaviour
         }
         else
         {
-            if (AsteroidsPool.TryGetObject(out var asteroid))
+            if (_asteroidsPool.TryGetObject(out var asteroid))
             {
                 PlaceAndActivate(asteroid.transform, spawnPoint);
                 asteroid.SetDirection(spawnPoint.up);
@@ -101,12 +109,14 @@ public class HazardSpawner : MonoBehaviour
     public void ReturnAsteroidToPool(Asteroid asteroid)
     {
         asteroid.OnDead -= ReturnAsteroidToPool;
-        AsteroidsPool.ReturnObject(asteroid);
+        RewardableDied?.Invoke(asteroid.Reward);
+        _asteroidsPool.ReturnObject(asteroid);
     }
 
     public void ReturnUFOToPool(UFO returnedUFO)
     {
         returnedUFO.OnDestroy -= ReturnUFOToPool;
-        UFOPool.ReturnObject(returnedUFO);
+        RewardableDied?.Invoke(returnedUFO.Reward);
+        _ufoPool.ReturnObject(returnedUFO);
     }
 }

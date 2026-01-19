@@ -284,13 +284,15 @@ MonoBehaviour:
   - {fileID: 1254559520}
   - {fileID: 1861761810}
   - {fileID: 1177762916}
-  _fragmentsPool: {fileID: 1266381315}
   _ufoCapacity: 10
   _ufoPrefab: {fileID: 8963031778390121647, guid: 137cec28d36f8414ea362c0efb9bf441, type: 3}
   _ufoContainer: {fileID: 1601720354}
   _asteroidsCapacity: 10
   _asteroidPrefab: {fileID: 7088939863630968828, guid: aac7e98a6d24e2c4292be6da3c4d75e8, type: 3}
   _asteroidContainer: {fileID: 2058280045}
+  _fragmentsPoolCapacity: 20
+  _fragmentPrefab: {fileID: 1134801146294726506, guid: 4c320ae5a1b000540a86a3b4a398cb5d, type: 3}
+  _fragmentContainer: {fileID: 1266381316}
 --- !u!4 &218693364
 Transform:
   m_ObjectHideFlags: 0
@@ -1025,7 +1027,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1266381316}
-  - component: {fileID: 1266381315}
   m_Layer: 0
   m_Name: FragmentsPool
   m_TagString: Untagged
@@ -1033,20 +1034,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1266381315
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1266381314}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 445777c738264053bb346335e07ea717, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _fragmentPrefab: {fileID: 1134801146294726506, guid: 4c320ae5a1b000540a86a3b4a398cb5d, type: 3}
-  _capacity: 10
 --- !u!4 &1266381316
 Transform:
   m_ObjectHideFlags: 0
@@ -1278,6 +1265,7 @@ MonoBehaviour:
   _bounceForce: 5
   _polygonCollider2D: {fileID: 2025016356}
   _invelnurabilityDuration: 5000
+  _invulnerabilityCoolDown: 2500
 --- !u!95 &2025016355
 Animator:
   serializedVersion: 5

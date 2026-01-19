@@ -10,6 +10,7 @@ public class PlayerModel : IInitializable, IDisposable
     private PolygonCollider2D _polygonCollider2D;
     private CancellationTokenSource _cancellationTokenSource;
     private int _invulnerabilityDuration;
+    private int _invulnerabilityCoolDown;
 
     [Inject]
     public void Construct(Player player)
@@ -17,6 +18,7 @@ public class PlayerModel : IInitializable, IDisposable
         _player = player;
         _polygonCollider2D = _player.PolygonCollider2D;
         _invulnerabilityDuration = _player.InvulnerabilityDuration;
+        _invulnerabilityCoolDown = _player.InvulnerabilityCoolDown;
         _cancellationTokenSource = new CancellationTokenSource();
     }
 
@@ -39,8 +41,11 @@ public class PlayerModel : IInitializable, IDisposable
 
     private async UniTaskVoid TurnOffCollider()
     {
+        _player.ChangeInvelnurabilityStatus(true);
         _polygonCollider2D.enabled = false;
         await UniTask.Delay(_invulnerabilityDuration, cancellationToken: _cancellationTokenSource.Token);
+        _player.ChangeInvelnurabilityStatus(false);
+        await UniTask.Delay(_invulnerabilityCoolDown, cancellationToken: _cancellationTokenSource.Token);
         _polygonCollider2D.enabled = true;
     }
 }

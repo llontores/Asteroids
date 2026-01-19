@@ -43,13 +43,18 @@ public class PlayerMover : IInitializable, IDisposable, ITickable
 
     private void Accelerate()
     {
+        if(_player.IsInvulnerable)
+            return;
         _physics.AddAcceleration(_playerTransform.up);
     }
 
     private void Turn(TurnSignal args)
     {
         int turnIndex = args.TurnIndex;
-
+        
+        if(_player.IsInvulnerable)
+            return;
+        
         _playerTransform.Rotate(0, 0, turnIndex * _turnSpeed * Time.deltaTime);
     }
 

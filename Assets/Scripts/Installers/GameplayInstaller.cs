@@ -8,6 +8,8 @@ public class GameplayInstaller : MonoInstaller
     public override void InstallBindings()
     {
         Container.Bind<Player>().FromComponentInHierarchy().AsSingle();
+        Container.BindInterfacesAndSelfTo<RewardCounter>().AsSingle().NonLazy();
+        Container.Bind<HazardSpawner>().FromComponentInHierarchy().AsSingle();
         Container.BindInterfacesAndSelfTo<PlayerMover>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<DesktopInput>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<PlayerView>().AsSingle().NonLazy();
