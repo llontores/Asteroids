@@ -1,17 +1,23 @@
-﻿using DefaultNamespace;
-using Inputs;
+﻿using Inputs;
 using Signals;
+using UnityEngine;
 using Zenject;
 
 public class GameplayInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
+        SignalBusInstaller.Install(Container);
+
+        Container.DeclareSignal<AccelerationSignal>();
+        Container.DeclareSignal<TurnSignal>();
+        Container.DeclareSignal<BulletShootSignal>();
+        Container.DeclareSignal<LaserShootSignal>();
+
         Container.Bind<Player>().FromComponentInHierarchy().AsSingle();
         Container.BindInterfacesAndSelfTo<RewardCounter>().AsSingle().NonLazy();
         Container.Bind<HazardSpawner>().FromComponentInHierarchy().AsSingle();
         Container.BindInterfacesAndSelfTo<PlayerMover>().AsSingle().NonLazy();
-        Container.BindInterfacesAndSelfTo<DesktopInput>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<PlayerView>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<ScreenWrapper>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<PlayerShooter>().AsSingle().NonLazy();
@@ -19,13 +25,10 @@ public class GameplayInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<PlayerModel>().AsSingle().NonLazy();
         Container.Bind<BulletsContainer>().FromComponentInHierarchy().AsSingle();
         Container.Bind<WorldSpace>().FromComponentInHierarchy().AsSingle();
-        
-        SignalBusInstaller.Install(Container);
-        
-        Container.DeclareSignal<AccelerationSignal>();
-        Container.DeclareSignal<TurnSignal>();
-        Container.DeclareSignal<BulletShootSignal>();
-        Container.DeclareSignal<AccelerationSignal>();
-        Container.DeclareSignal<LaserShootSignal>();
+
+        if (SystemInfo.deviceType == DeviceType.Handheld)
+            Container.BindInterfacesAndSelfTo<MobileInput>().AsSingle();
+        else
+            Container.BindInterfacesAndSelfTo<DesktopInput>().AsSingle();
     }
 }

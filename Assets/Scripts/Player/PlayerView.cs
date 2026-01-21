@@ -29,7 +29,7 @@ public class PlayerView : IInitializable, IDisposable
 
     private void ManageAccelerationAnimation(AccelerationSignal args)
     {
-        _animator.SetBool(AcceleratingState, args.Pressed);
+        _animator.SetBool(AcceleratingState, args.IsPressed);
     }
 
 }

@@ -2,6 +2,6 @@
 {
     public class AccelerationSignal
     {
-        public bool Pressed;
+        public bool IsPressed;
     }
 }

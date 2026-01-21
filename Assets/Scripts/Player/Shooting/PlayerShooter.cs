@@ -1,6 +1,5 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
-using DefaultNamespace;
 using Signals;
 using UnityEngine;
 using Zenject;

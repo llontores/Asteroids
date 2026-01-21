@@ -1,5 +1,4 @@
-﻿using DefaultNamespace;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 public class Bullet : MonoBehaviour, IDestroyable

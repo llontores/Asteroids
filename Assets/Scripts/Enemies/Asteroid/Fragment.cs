@@ -1,5 +1,4 @@
 ﻿using System;
-using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
