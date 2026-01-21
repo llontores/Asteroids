@@ -1,5 +1,4 @@
-﻿using Inputs;
-using Signals;
+﻿using Signals;
 using UnityEngine;
 using Zenject;
 
@@ -15,6 +14,7 @@ public class GameplayInstaller : MonoInstaller
         Container.DeclareSignal<LaserShootSignal>();
 
         Container.Bind<Player>().FromComponentInHierarchy().AsSingle();
+        Container.Bind<MobileButtonsHandler>().FromComponentInHierarchy().AsSingle();
         Container.BindInterfacesAndSelfTo<RewardCounter>().AsSingle().NonLazy();
         Container.Bind<HazardSpawner>().FromComponentInHierarchy().AsSingle();
         Container.BindInterfacesAndSelfTo<PlayerMover>().AsSingle().NonLazy();
@@ -25,10 +25,11 @@ public class GameplayInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<PlayerModel>().AsSingle().NonLazy();
         Container.Bind<BulletsContainer>().FromComponentInHierarchy().AsSingle();
         Container.Bind<WorldSpace>().FromComponentInHierarchy().AsSingle();
+        Container.BindInterfacesAndSelfTo<MobileInput>().AsSingle();
 
-        if (SystemInfo.deviceType == DeviceType.Handheld)
-            Container.BindInterfacesAndSelfTo<MobileInput>().AsSingle();
-        else
-            Container.BindInterfacesAndSelfTo<DesktopInput>().AsSingle();
+        // if (SystemInfo.deviceType == DeviceType.Handheld)
+        //     Container.BindInterfacesAndSelfTo<MobileInput>().AsSingle();
+        // else
+        //     Container.BindInterfacesAndSelfTo<DesktopInput>().AsSingle();
     }
 }

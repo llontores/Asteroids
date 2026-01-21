@@ -16,7 +16,7 @@ public class Asteroid : MonoBehaviour, IDestroyable
     [SerializeField] private int _maxFragmentAmount;
     [SerializeField] private float _bounceForce;
 
-    public event UnityAction<Asteroid> OnDead;
+    public event UnityAction<Asteroid, DestroyReason> OnDead;
     public int Reward => _reward;
 
     private int _spinningTurn;
@@ -65,7 +65,7 @@ public class Asteroid : MonoBehaviour, IDestroyable
             SpawnFragments();
         }
 
-        OnDead?.Invoke(this);
+        OnDead?.Invoke(this, reason);
     }
     
     private void OnTriggerEnter2D(Collider2D other)

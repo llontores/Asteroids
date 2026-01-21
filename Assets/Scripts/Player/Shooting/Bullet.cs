@@ -33,7 +33,7 @@ public class Bullet : MonoBehaviour, IDestroyable
     {
         if (collision.TryGetComponent(out IDestroyable shootable))
         {
-            shootable.Destroy(DestroyReason.Bullet);
+            shootable.Destroy(DestroyReason.Shootable);
             OnBulletDestroyed?.Invoke(this);
         }
     }

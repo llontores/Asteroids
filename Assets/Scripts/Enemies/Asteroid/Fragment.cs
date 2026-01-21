@@ -13,7 +13,7 @@ public class Fragment : MonoBehaviour, IDestroyable
     [SerializeField] private float _bounceForce;
     [SerializeField] private int _reward;
     
-    public event UnityAction<Fragment> OnDestroy;
+    public event UnityAction<Fragment, DestroyReason> OnDestroy;
     public int Reward => _reward;
     
     private Physics _physics;
@@ -38,7 +38,7 @@ public class Fragment : MonoBehaviour, IDestroyable
 
     public void Destroy(DestroyReason reason)
     {
-        OnDestroy?.Invoke(this);
+        OnDestroy?.Invoke(this, reason);
     }
     
     private void OnTriggerEnter2D(Collider2D other)

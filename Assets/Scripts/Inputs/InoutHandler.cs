@@ -1,4 +1,4 @@
-using Signals;
+﻿using Signals;
 using Zenject;
 
 public abstract class InputHandler 
@@ -21,7 +21,7 @@ public abstract class InputHandler
         _signalBus.Fire(new TurnSignal{TurnIndex = TurnIndex});
     }
 
-    protected void FireBulletShot()
+    protected void FireBulletShot()  
     {
         _signalBus.Fire(new BulletShootSignal());
     }

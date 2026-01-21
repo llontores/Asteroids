@@ -5,7 +5,7 @@ using Zenject;
 public class FragmentsPool : ObjectPool<Fragment>
 {
     private RewardCounter _rewardCounter;
-    private UnityAction<int> _rewardableDied;
+    private UnityAction<int, DestroyReason> _rewardableDied;
 
     [Inject]
     public void Construct(RewardCounter rewardCounter)
@@ -13,7 +13,7 @@ public class FragmentsPool : ObjectPool<Fragment>
         _rewardCounter = rewardCounter;
     }
     
-    public FragmentsPool(int capacity, Fragment prefab, Transform container, UnityAction<int> rewardableDied) : base(capacity, prefab, container)
+    public FragmentsPool(int capacity, Fragment prefab, Transform container, UnityAction<int, DestroyReason> rewardableDied) : base(capacity, prefab, container)
     {
         _rewardableDied = rewardableDied;
     }
@@ -29,10 +29,10 @@ public class FragmentsPool : ObjectPool<Fragment>
         return null;
     }
 
-    private void ReturnFragmentToPool(Fragment fragment)
+    private void ReturnFragmentToPool(Fragment fragment, DestroyReason reason)
     {
         fragment.OnDestroy -= ReturnFragmentToPool;
-        _rewardableDied?.Invoke(fragment.Reward);
+        _rewardableDied?.Invoke(fragment.Reward, reason);
         ReturnObject(fragment);
     }
 }

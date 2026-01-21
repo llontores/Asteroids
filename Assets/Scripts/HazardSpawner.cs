@@ -25,7 +25,7 @@ public class HazardSpawner : MonoBehaviour
     [SerializeField] private Fragment _fragmentPrefab;
     [SerializeField] private Transform _fragmentContainer;
 
-    public event UnityAction<int> RewardableDied;
+    public event UnityAction<int, DestroyReason> RewardableDied;
     
     private ObjectPool<UFO> _ufoPool;
     private ObjectPool<Asteroid> _asteroidsPool;
@@ -106,17 +106,17 @@ public class HazardSpawner : MonoBehaviour
         hazard.gameObject.SetActive(true);
     }
 
-    public void ReturnAsteroidToPool(Asteroid asteroid)
+    public void ReturnAsteroidToPool(Asteroid asteroid, DestroyReason reason)
     {
         asteroid.OnDead -= ReturnAsteroidToPool;
-        RewardableDied?.Invoke(asteroid.Reward);
+        RewardableDied?.Invoke(asteroid.Reward, reason);
         _asteroidsPool.ReturnObject(asteroid);
     }
 
-    public void ReturnUFOToPool(UFO returnedUFO)
+    public void ReturnUFOToPool(UFO returnedUFO, DestroyReason reason)
     {
         returnedUFO.OnDestroy -= ReturnUFOToPool;
-        RewardableDied?.Invoke(returnedUFO.Reward);
+        RewardableDied?.Invoke(returnedUFO.Reward, reason);
         _ufoPool.ReturnObject(returnedUFO);
     }
 }

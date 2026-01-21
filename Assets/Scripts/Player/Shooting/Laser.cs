@@ -134,7 +134,7 @@ public class Laser : IInitializable, IDisposable
                     furthestPoint = hit.point;
                 }
 
-                hit.collider.GetComponent<IDestroyable>()?.Destroy(DestroyReason.Laser);
+                hit.collider.GetComponent<IDestroyable>()?.Destroy(DestroyReason.Shootable);
             }
 
             endPoint = furthestPoint;

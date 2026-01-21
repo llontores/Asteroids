@@ -11,17 +11,20 @@ public class RewardCounter : IDisposable
     public void Construct(HazardSpawner hazardSpawner)
     {
         _hazardSpawner = hazardSpawner;
-        _hazardSpawner.RewardableDied += AddScore;
+        _hazardSpawner.RewardableDied += TryAddScore;
     }
     
-    public void AddScore(int score)
+    public void TryAddScore(int score, DestroyReason reason)
     {
+        if(reason == DestroyReason.World)
+            return;
+        
         _reward += score;
         Debug.Log($"Reward: {_reward}");
     }
 
     public void Dispose()
     {
-        _hazardSpawner.RewardableDied -= AddScore;
+        _hazardSpawner.RewardableDied -= TryAddScore;
     }
 }

@@ -2,32 +2,33 @@
 using Zenject;
 using UnityEngine;
 
-namespace Inputs
+
+public class DesktopInput : InputHandler, ITickable
 {
-    public class DesktopInput : InputHandler, ITickable
+    [Inject]
+    public void Construct(MobileButtonsHandler buttonsHandler)
     {
-        public void Tick()
-        {
-            // if (Input.GetKeyDown(KeyCode.W))
-            //     FireAcceleration(true);
+        buttonsHandler.gameObject.SetActive(false);
+    }
+    
+    public void Tick()
+    {
+        if (Input.GetKeyUp(KeyCode.W))
+            FireAcceleration(false);
 
-            if (Input.GetKeyUp(KeyCode.W))
-                FireAcceleration(false);
+        if (Input.GetKey(KeyCode.W))
+            FireAcceleration(true);
 
-            if (Input.GetKey(KeyCode.W))
-                FireAcceleration(true);
+        if (Input.GetKey(KeyCode.A))
+            FireRotation(1);
 
-            if (Input.GetKey(KeyCode.A))
-                FireRotation(1);
+        if (Input.GetKey(KeyCode.D))
+            FireRotation(-1);
 
-            if (Input.GetKey(KeyCode.D))
-                FireRotation(-1);
+        if (Input.GetMouseButtonDown(0))
+            FireBulletShot();
 
-            if (Input.GetMouseButtonDown(0))
-                FireBulletShot();
-
-            if (Input.GetMouseButtonDown(1))
-                FireLaserShot();
-        }
+        if (Input.GetMouseButtonDown(1))
+            FireLaserShot();
     }
 }

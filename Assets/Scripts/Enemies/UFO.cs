@@ -14,7 +14,7 @@ public class UFO : MonoBehaviour, IDestroyable
     [SerializeField] private float _spinningMaxSpeed;
     [SerializeField] private float _bounceForce;
     
-    public event UnityAction<UFO> OnDestroy;
+    public event UnityAction<UFO, DestroyReason> OnDestroy;
     private int _spinningTurn;
     private float _spinningSpeed;
     private Vector2 _velocity;
@@ -58,6 +58,6 @@ public class UFO : MonoBehaviour, IDestroyable
     
     public void Destroy(DestroyReason reason)
     {
-        OnDestroy?.Invoke(this);
+        OnDestroy?.Invoke(this, reason);
     }
 }
