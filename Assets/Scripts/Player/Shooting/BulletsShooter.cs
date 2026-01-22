@@ -4,7 +4,7 @@ using Signals;
 using UnityEngine;
 using Zenject;
 
-public class PlayerShooter : IInitializable, IDisposable
+public class BulletsShooter : IInitializable, IDisposable
 {
     private SignalBus _signalBus;
     private Transform _shootPoint;
@@ -12,15 +12,17 @@ public class PlayerShooter : IInitializable, IDisposable
     private float _laserShootCooldown;
     private Bullet _bulletPrefab;
     private bool _canShootBullets = true;
+    private Player _player;
     public ObjectPool<Bullet> BulletPool {get; private set; }
 
     [Inject]
     public void Construct(Player player, SignalBus signalBus, BulletsContainer  bulletsContainer)
     {
+        _player = player;
         _signalBus = signalBus;
-        _shootPoint = player.ShootPoint;
-        _bulletShootCooldown = player.BulletsShootCooldown;
-        _bulletPrefab = player.BulletPrefab;
+        _shootPoint = _player.ShootPoint;
+        _bulletShootCooldown = _player.BulletsShootCooldown;
+        _bulletPrefab = _player.BulletPrefab;
         BulletPool = new ObjectPool<Bullet>(10, _bulletPrefab, bulletsContainer.transform);
     }
     
@@ -36,7 +38,7 @@ public class PlayerShooter : IInitializable, IDisposable
 
     private void FireBullets()
     {
-        if (_canShootBullets == false)
+        if (_canShootBullets == false || _player.IsInvulnerable)
             return;
 
         if (BulletPool.TryGetObject(out Bullet bullet))

@@ -5,7 +5,7 @@ using Signals;
 using UnityEngine;
 using Zenject;
 
-public class Laser : IInitializable, IDisposable
+public class LaserShooter : IInitializable, IDisposable
 {
     private SignalBus _signalBus;
     private float _maxDistance;
@@ -18,6 +18,7 @@ public class Laser : IInitializable, IDisposable
     private float _currentAmmoCount;
     private float _maxAmmoCount;
     private float _ammoReloadCooldown;
+    private Player _player;
 
     private CancellationTokenSource _shootCts;
     private CancellationTokenSource _reloadCts;
@@ -28,16 +29,17 @@ public class Laser : IInitializable, IDisposable
     [Inject]
     public void Construct(SignalBus signalBus, Player player)
     {
+        _player =  player;
         _signalBus = signalBus;
-        _lineRenderer = player.LineRenderer;
-        _maxDistance = player.MaxRayDistance;
-        _shootPoint = player.ShootPoint;
-        _laserDuration = player.LaserDuration;
-        _layerMaskIgnore = player.LayerMaskIgnore;
-        _cooldown = player.LaserCooldown;
-        _maxAmmoCount = player.MaxLaserAmmoCount;
+        _lineRenderer = _player.LineRenderer;
+        _maxDistance = _player.MaxRayDistance;
+        _shootPoint = _player.ShootPoint;
+        _laserDuration = _player.LaserDuration;
+        _layerMaskIgnore = _player.LayerMaskIgnore;
+        _cooldown = _player.LaserCooldown;
+        _maxAmmoCount = _player.MaxLaserAmmoCount;
         _currentAmmoCount = _maxAmmoCount;
-        _ammoReloadCooldown = player.LaserReloadCooldown;
+        _ammoReloadCooldown = _player.LaserReloadCooldown;
         _reloadCts = new CancellationTokenSource();
         
         if (_lineRenderer != null) 
@@ -53,7 +55,7 @@ public class Laser : IInitializable, IDisposable
 
     private async UniTaskVoid ShootLaserRoutine()
     {
-        if (Time.time < _lastShootTime + _cooldown || _currentAmmoCount == 0)
+        if (Time.time < _lastShootTime + _cooldown || _currentAmmoCount == 0 || _player.IsInvulnerable)
             return;
 
         if (_shootCts != null)

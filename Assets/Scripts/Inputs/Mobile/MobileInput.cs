@@ -10,12 +10,12 @@ public class MobileInput : InputHandler, IDisposable
     {
         _handler = handler;
         _handler.gameObject.SetActive(true);
-        _handler.Accelerate.Pressed += AccelerationButtonPressed;
-        _handler.Accelerate.Released += AccelerationButtonReleased;
-        _handler.TurnLeft.Pressed += TurnLeftButtonPressed;
-        _handler.TurnRight.Pressed += TurnRightButtonPressed;
-        _handler.ShootBullet.Pressed += ShootBulletButtonPressed;
-        _handler.ShootLaser.Pressed += ShootLaserButtonPressed;
+        _handler.Accelerate.ButtonPressed += AccelerationButtonPressed;
+        _handler.Accelerate.ButtonReleased += AccelerationButtonReleased;
+        _handler.TurnLeft.ButtonPressed += TurnLeftButtonPressed;
+        _handler.TurnRight.ButtonPressed += TurnRightButtonPressed;
+        _handler.ShootBullet.ButtonPressed += ShootBulletButtonPressed;
+        _handler.ShootLaser.ButtonPressed += ShootLaserButtonPressed;
     }
 
     private void AccelerationButtonPressed()
@@ -50,11 +50,11 @@ public class MobileInput : InputHandler, IDisposable
 
     public void Dispose()
     {
-        _handler.Accelerate.Pressed -= AccelerationButtonPressed;
-        _handler.Accelerate.Released -= AccelerationButtonReleased;
-        _handler.TurnLeft.Pressed -= TurnLeftButtonPressed;
-        _handler.TurnRight.Pressed -= TurnRightButtonPressed;
-        _handler.ShootBullet.Pressed -= ShootBulletButtonPressed;
-        _handler.ShootLaser.Pressed -= ShootLaserButtonPressed;
+        _handler.Accelerate.ButtonPressed -= AccelerationButtonPressed;
+        _handler.Accelerate.ButtonReleased -= AccelerationButtonReleased;
+        _handler.TurnLeft.ButtonPressed -= TurnLeftButtonPressed;
+        _handler.TurnRight.ButtonPressed -= TurnRightButtonPressed;
+        _handler.ShootBullet.ButtonPressed -= ShootBulletButtonPressed;
+        _handler.ShootLaser.ButtonPressed -= ShootLaserButtonPressed;
     }
 }
