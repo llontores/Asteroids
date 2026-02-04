@@ -10,13 +10,15 @@ public class PlayerView : IInitializable, IDisposable
     private Animator _animator;
     private SignalBus _signalBus;
     private ParticleSystem _bulletShootParticles;
+    private Player _player;
 
     [Inject]
     public void Construct(SignalBus signalBus, Player player)
     {
+        _player = player;
         _signalBus = signalBus;
-        _animator = player.Animator;
-        _bulletShootParticles = player.BulletShootParticles;
+        _animator = _player.Animator;
+        _bulletShootParticles = _player.BulletShootParticles;
     }
 
     public void Initialize()
@@ -38,7 +40,7 @@ public class PlayerView : IInitializable, IDisposable
 
     private void EmitBulletShootParticles()
     {
-        _bulletShootParticles.Play();
+        if (!_player.IsInvulnerable)
+            _bulletShootParticles.Play();
     }
-
 }
