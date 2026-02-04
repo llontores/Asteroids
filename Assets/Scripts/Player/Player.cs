@@ -29,6 +29,7 @@ public class Player : MonoBehaviour
     [SerializeField] private int _invelnurabilityDuration;
     [SerializeField] private int _invulnerabilityCoolDown;
     [SerializeField] private int _maxHealth;
+    [SerializeField] private ParticleSystem _bulletShootParticles;
     
     private int _currentHealth;
 
@@ -54,6 +55,8 @@ public class Player : MonoBehaviour
     public int InvulnerabilityDuration => _invelnurabilityDuration;
     public int InvulnerabilityCoolDown => _invulnerabilityCoolDown;
     public bool IsInvulnerable { get; private set; }
+
+    public ParticleSystem BulletShootParticles => _bulletShootParticles;
 
     private void Start()
     {
