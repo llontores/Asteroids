@@ -1,4 +1,5 @@
-﻿public interface IDestroyable
-{
-    void Destroy(DestroyReason reason);
-}
+﻿
+    public interface IDestroyable
+    {
+        public void Destroy(DestroyReason reason);
+    }

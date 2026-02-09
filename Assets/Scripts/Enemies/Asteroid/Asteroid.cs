@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-public class Asteroid : MonoBehaviour, IDestroyable
+public class Asteroid : Entity, IDestroyable
 {
     private const int LeftTurnIndex = 1;
     private const int RightTurnIndex = -1;
@@ -9,15 +9,14 @@ public class Asteroid : MonoBehaviour, IDestroyable
     [SerializeField] private float _thrust;
     [SerializeField] private float _drag;
     [SerializeField] private float _maxSpeed;
-    [SerializeField] private int _reward;
     [SerializeField] private float _spinningMinSpeed;
     [SerializeField] private float _spinningMaxSpeed;
     [SerializeField] private int _minFragmentAmount;
     [SerializeField] private int _maxFragmentAmount;
     [SerializeField] private float _bounceForce;
 
-    public event UnityAction<Asteroid, DestroyReason> OnDead;
-    public int Reward => _reward;
+    public event UnityAction<Asteroid> OnDead;
+
 
     private int _spinningTurn;
     private float _spinningSpeed;
@@ -60,17 +59,19 @@ public class Asteroid : MonoBehaviour, IDestroyable
 
     public void Destroy(DestroyReason reason)
     {
+        SetDestroyReason(reason);
+        
         if (reason != DestroyReason.World)
         {
             SpawnFragments();
         }
 
-        OnDead?.Invoke(this, reason);
+        OnDead?.Invoke(this);
     }
     
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.TryGetComponent(out Player player))
+        if (other.TryGetComponent(out Player player ) || other.TryGetComponent(out InvulnerableCircle invulnerableCircle))
         {
             Vector2 contactPoint = other.ClosestPoint(transform.position);
             Vector2 normal = ((Vector2)transform.position - contactPoint).normalized;

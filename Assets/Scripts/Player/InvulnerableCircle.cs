@@ -1,7 +1,7 @@
-﻿namespace Player
-{
-    public class InvulnerableCircle
+﻿
+    using UnityEngine;
+
+    public class InvulnerableCircle : MonoBehaviour
     {
         
     }
-}

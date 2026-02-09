@@ -12,6 +12,7 @@ public class GameplayInstaller : MonoInstaller
         Container.DeclareSignal<TurnSignal>();
         Container.DeclareSignal<BulletShootSignal>();
         Container.DeclareSignal<LaserShootSignal>();
+        Container.DeclareSignal<DestroyableDiedSignal>();
 
         Container.Bind<Player>().FromComponentInHierarchy().AsSingle();
         Container.Bind<MobileButtonsHandler>().FromComponentInHierarchy().AsSingle();
@@ -22,9 +23,11 @@ public class GameplayInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<ScreenWrapper>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<BulletsShooter>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<LaserShooter>().AsSingle().NonLazy();
+        Container.BindInterfacesAndSelfTo<LaserView>().FromComponentsInHierarchy().AsSingle();
         Container.BindInterfacesAndSelfTo<PlayerModel>().AsSingle().NonLazy();
         Container.Bind<BulletsContainer>().FromComponentInHierarchy().AsSingle();
         Container.Bind<WorldSpace>().FromComponentInHierarchy().AsSingle();
+        Container.BindInterfacesAndSelfTo<ExplosionParticlesPool>().FromComponentInHierarchy().AsSingle();
 
         if (SystemInfo.deviceType == DeviceType.Handheld)
             Container.BindInterfacesAndSelfTo<MobileInput>().AsSingle();

@@ -11,6 +11,7 @@ public class PlayerModel : IInitializable, IDisposable
     private CancellationTokenSource _cancellationTokenSource;
     private int _invulnerabilityDuration;
     private int _invulnerabilityCoolDown;
+    private InvulnerableCircle _invulnerableCircle;
 
     [Inject]
     public void Construct(Player player)
@@ -20,11 +21,13 @@ public class PlayerModel : IInitializable, IDisposable
         _invulnerabilityDuration = _player.InvulnerabilityDuration;
         _invulnerabilityCoolDown = _player.InvulnerabilityCoolDown;
         _cancellationTokenSource = new CancellationTokenSource();
+        _invulnerableCircle = _player.InvulnerableEffectCircle;
     }
 
     public void Initialize()
     {
         _player.OnTriggerEntered += StartInvulnerability;
+        _invulnerableCircle.gameObject.SetActive(false);
     }
 
     public void Dispose()
@@ -41,11 +44,17 @@ public class PlayerModel : IInitializable, IDisposable
 
     private async UniTaskVoid TurnOffCollider()
     {
-        _player.ChangeInvelnurabilityStatus(true);
         _polygonCollider2D.enabled = false;
+        _invulnerableCircle.gameObject.SetActive(true);
+        _player.ChangeInvelnurabilityStatus(true);
+
         await UniTask.Delay(_invulnerabilityDuration, cancellationToken: _cancellationTokenSource.Token);
-        _player.ChangeInvelnurabilityStatus(false);
+    
+        _player.ChangeInvelnurabilityStatus(false); 
+        _invulnerableCircle.gameObject.SetActive(false);
+        
         await UniTask.Delay(_invulnerabilityCoolDown, cancellationToken: _cancellationTokenSource.Token);
+        
         _polygonCollider2D.enabled = true;
     }
 }

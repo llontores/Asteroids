@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using Signals;
 using UnityEngine;
 using UnityEngine.Events;
 using Zenject;
@@ -36,12 +37,13 @@ public class HazardSpawner : MonoBehaviour
     
 
     [Inject]
-    public void Construct(Player player)
+    public void Construct(Player player, SignalBus signalBus)
     {
+        _signalBus = signalBus;
         _target = player.transform;
         _ufoPool = new ObjectPool<UFO>(_ufoCapacity, _ufoPrefab, _ufoContainer);
         _asteroidsPool = new ObjectPool<Asteroid>(_asteroidsCapacity, _asteroidPrefab, _asteroidContainer);
-        _fragmentsPool = new FragmentsPool(_fragmentsPoolCapacity, _fragmentPrefab, _fragmentContainer, RewardableDied);
+        _fragmentsPool = new FragmentsPool(_fragmentsPoolCapacity, _fragmentPrefab, _fragmentContainer, signalBus);
 
         for (int i = 0; i < _asteroidContainer.childCount; i++)
         {
@@ -90,7 +92,7 @@ public class HazardSpawner : MonoBehaviour
         }
         else
         {
-            if (_asteroidsPool.TryGetObject(out var asteroid))
+            if (_asteroidsPool.TryGetObject(out Asteroid asteroid))
             {
                 PlaceAndActivate(asteroid.transform, spawnPoint);
                 asteroid.SetDirection(spawnPoint.up);
@@ -106,17 +108,17 @@ public class HazardSpawner : MonoBehaviour
         hazard.gameObject.SetActive(true);
     }
 
-    public void ReturnAsteroidToPool(Asteroid asteroid, DestroyReason reason)
+    public void ReturnAsteroidToPool(Asteroid asteroid)
     {
         asteroid.OnDead -= ReturnAsteroidToPool;
-        RewardableDied?.Invoke(asteroid.Reward, reason);
+        _signalBus.Fire(new DestroyableDiedSignal{Entity = asteroid});
         _asteroidsPool.ReturnObject(asteroid);
     }
 
-    public void ReturnUFOToPool(UFO returnedUFO, DestroyReason reason)
+    public void ReturnUFOToPool(UFO returnedUFO)
     {
         returnedUFO.OnDestroy -= ReturnUFOToPool;
-        RewardableDied?.Invoke(returnedUFO.Reward, reason);
+        _signalBus.Fire(new DestroyableDiedSignal{Entity = returnedUFO});
         _ufoPool.ReturnObject(returnedUFO);
     }
 }

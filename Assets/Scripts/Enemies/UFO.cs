@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-public class UFO : MonoBehaviour, IDestroyable
+public class UFO : Entity, IDestroyable
 {
     private const int LeftTurnIndex = 1;
     private const int RightTurnIndex = -1;
@@ -9,19 +9,17 @@ public class UFO : MonoBehaviour, IDestroyable
     [SerializeField] private float _thrust;
     [SerializeField] private float _drag;
     [SerializeField] private float _maxSpeed;
-    [SerializeField] private int _reward;
     [SerializeField] private float _spinningMinSpeed;
     [SerializeField] private float _spinningMaxSpeed;
     [SerializeField] private float _bounceForce;
     
-    public event UnityAction<UFO, DestroyReason> OnDestroy;
+    public event UnityAction<UFO> OnDestroy;
     private int _spinningTurn;
     private float _spinningSpeed;
     private Vector2 _velocity;
     private Physics _physics;
     private Vector3 _direction;
     private Transform _target;
-    public int Reward => _reward;
     
     
     private void Start()
@@ -42,7 +40,8 @@ public class UFO : MonoBehaviour, IDestroyable
     
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.TryGetComponent(out Player player))
+        if (other.TryGetComponent(out Player player ) || other.TryGetComponent(out InvulnerableCircle invulnerableCircle))
+
         {
             Vector2 contactPoint = other.ClosestPoint(transform.position);
             Vector2 normal = ((Vector2)transform.position - contactPoint).normalized;
@@ -58,6 +57,7 @@ public class UFO : MonoBehaviour, IDestroyable
     
     public void Destroy(DestroyReason reason)
     {
-        OnDestroy?.Invoke(this, reason);
+        SetDestroyReason(reason);
+        OnDestroy?.Invoke(this);
     }
 }

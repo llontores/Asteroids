@@ -11,10 +11,12 @@ public class Bullet : MonoBehaviour, IDestroyable
     
     private Physics _physics;
     private Vector2 _velocity;
+    private bool _isUsed;
 
     private void OnEnable()
     {
         _physics.Velocity = Vector2.zero;
+        _isUsed = false;
     }
 
     private void Awake()
@@ -31,8 +33,11 @@ public class Bullet : MonoBehaviour, IDestroyable
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if(_isUsed) return;
+        
         if (collision.TryGetComponent(out IDestroyable shootable))
         {
+            _isUsed = true;
             shootable.Destroy(DestroyReason.Shootable);
             OnBulletDestroyed?.Invoke(this);
         }

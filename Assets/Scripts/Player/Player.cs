@@ -30,6 +30,7 @@ public class Player : MonoBehaviour
     [SerializeField] private int _invulnerabilityCoolDown;
     [SerializeField] private int _maxHealth;
     [SerializeField] private ParticleSystem _bulletShootParticles;
+    [SerializeField] private InvulnerableCircle _invulnerableEffectCircle;
     
     private int _currentHealth;
 
@@ -57,6 +58,7 @@ public class Player : MonoBehaviour
     public bool IsInvulnerable { get; private set; }
 
     public ParticleSystem BulletShootParticles => _bulletShootParticles;
+    public InvulnerableCircle InvulnerableEffectCircle => _invulnerableEffectCircle;    
 
     private void Start()
     {
@@ -65,11 +67,16 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.TryGetComponent<Bullet>(out Bullet bullet))
-        {
+        if(IsInvulnerable)
+            return;
+        
+        if(collision.TryGetComponent<Bullet>(out Bullet _))
+            return;
+
+            Debug.Log($"коллизия сработала {collision.gameObject.name}" );
             OnTriggerEntered?.Invoke(collision);
             _currentHealth = Mathf.Clamp(_currentHealth - 1, 0, _maxHealth);
-        }
+        
     }
 
     public void ChangeInvelnurabilityStatus(bool status)

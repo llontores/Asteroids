@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
-public class Fragment : MonoBehaviour, IDestroyable
+public class Fragment : Entity, IDestroyable
 {
     private const int MaxDegree = 360;
     
@@ -11,10 +11,8 @@ public class Fragment : MonoBehaviour, IDestroyable
     [SerializeField] private float _dragForce;
     [SerializeField] private float _maxSpeed;
     [SerializeField] private float _bounceForce;
-    [SerializeField] private int _reward;
     
-    public event UnityAction<Fragment, DestroyReason> OnDestroy;
-    public int Reward => _reward;
+    public event UnityAction<Fragment> OnDestroy;
     
     private Physics _physics;
     private Vector2 _velocity;
@@ -38,12 +36,14 @@ public class Fragment : MonoBehaviour, IDestroyable
 
     public void Destroy(DestroyReason reason)
     {
-        OnDestroy?.Invoke(this, reason);
+        SetDestroyReason(reason);
+        OnDestroy?.Invoke(this);
     }
     
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.TryGetComponent(out Player player))
+        if (other.TryGetComponent(out Player player ) || other.TryGetComponent(out InvulnerableCircle invulnerableCircle))
+
         {
             Vector2 contactPoint = other.ClosestPoint(transform.position);
             Vector2 normal = ((Vector2)transform.position - contactPoint).normalized;

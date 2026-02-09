@@ -107,7 +107,7 @@ MonoBehaviour:
   _spinningMaxSpeed: 200
   _minFragmentAmount: 2
   _maxFragmentAmount: 4
-  _bounceForce: 10
+  _bounceForce: 15
 --- !u!50 &-9125575188213845707
 Rigidbody2D:
   serializedVersion: 4

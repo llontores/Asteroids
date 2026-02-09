@@ -1,30 +1,31 @@
 using System;
+using Signals;
 using UnityEngine;
 using Zenject;
 
 public class RewardCounter : IDisposable
 {
-    private HazardSpawner _hazardSpawner;
-    private int _reward;
+    private int _score;
+    private SignalBus _signalBus;
 
     [Inject]
-    public void Construct(HazardSpawner hazardSpawner)
+    public void Construct(SignalBus signalBus)
     {
-        _hazardSpawner = hazardSpawner;
-        _hazardSpawner.RewardableDied += TryAddScore;
+        _signalBus = signalBus;
+        _signalBus.Subscribe<DestroyableDiedSignal>(TryAddScore);
     }
     
-    public void TryAddScore(int score, DestroyReason reason)
+    public void TryAddScore(DestroyableDiedSignal args)
     {
-        if(reason == DestroyReason.World)
+        if(args.Entity.Reason == DestroyReason.World)
             return;
         
-        _reward += score;
-        Debug.Log($"Reward: {_reward}");
+        _score += args.Entity.Reward;
+        Debug.Log($"Score: {_score}");
     }
 
     public void Dispose()
     {
-        _hazardSpawner.RewardableDied -= TryAddScore;
+        _signalBus.Unsubscribe<DestroyableDiedSignal>(TryAddScore);
     }
 }

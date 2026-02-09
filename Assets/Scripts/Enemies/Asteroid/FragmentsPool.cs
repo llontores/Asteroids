@@ -1,21 +1,15 @@
-﻿using UnityEngine;
+﻿using Signals;
+using UnityEngine;
 using UnityEngine.Events;
 using Zenject;
 
 public class FragmentsPool : ObjectPool<Fragment>
 {
-    private RewardCounter _rewardCounter;
-    private UnityAction<int, DestroyReason> _rewardableDied;
-
-    [Inject]
-    public void Construct(RewardCounter rewardCounter)
-    {
-        _rewardCounter = rewardCounter;
-    }
+    private SignalBus _signalBus;
     
-    public FragmentsPool(int capacity, Fragment prefab, Transform container, UnityAction<int, DestroyReason> rewardableDied) : base(capacity, prefab, container)
+    public FragmentsPool(int capacity, Fragment prefab, Transform container, SignalBus signalBus) : base(capacity, prefab, container)
     {
-        _rewardableDied = rewardableDied;
+        _signalBus = signalBus;
     }
 
     public Fragment GetFragment()
@@ -29,10 +23,10 @@ public class FragmentsPool : ObjectPool<Fragment>
         return null;
     }
 
-    private void ReturnFragmentToPool(Fragment fragment, DestroyReason reason)
+    private void ReturnFragmentToPool(Fragment fragment)
     {
         fragment.OnDestroy -= ReturnFragmentToPool;
-        _rewardableDied?.Invoke(fragment.Reward, reason);
+        _signalBus.Fire(new DestroyableDiedSignal{Entity = fragment});
         ReturnObject(fragment);
     }
 }
