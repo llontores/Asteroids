@@ -7,38 +7,44 @@ using Random = UnityEngine.Random;
 
 public class HazardSpawner : MonoBehaviour
 {
-    [SerializeField] private int _minCoolDown;
-    [SerializeField] private int _maxCoolDown;
     [SerializeField] private Transform[] _spawnPoints;
     
     [Header("UFO Pool")]
-    [SerializeField] private int _ufoCapacity;
     [SerializeField] private UFO _ufoPrefab;
     [SerializeField] private Transform _ufoContainer;
     
     [Header("Asteroid Pool")]
-    [SerializeField] private int _asteroidsCapacity;
     [SerializeField] private Asteroid _asteroidPrefab;
     [SerializeField] private Transform _asteroidContainer;
     
     [Header("Fragments Pool")]
-    [SerializeField] private int _fragmentsPoolCapacity;
     [SerializeField] private Fragment _fragmentPrefab;
     [SerializeField] private Transform _fragmentContainer;
 
     public event UnityAction<int, DestroyReason> RewardableDied;
     
+    private int _minCoolDown;
+    private int _maxCoolDown;
+    private int _ufoCapacity;
+    private int _asteroidsCapacity;
+    private int _fragmentsPoolCapacity;
     private ObjectPool<UFO> _ufoPool;
     private ObjectPool<Asteroid> _asteroidsPool;
     private FragmentsPool _fragmentsPool;
     private bool _isSpawning = true;
     private SignalBus _signalBus;
     private Transform _target;
-    
+    private HazarSpawnerConfig _config;
 
     [Inject]
     public void Construct(Player player, SignalBus signalBus)
     {
+        _config = JsonConfigLoader.LoadFromResources<HazarSpawnerConfig>("Configs/hazardSpawner_config");
+        _minCoolDown = _config.MinCoolDown;
+        _maxCoolDown = _config.MaxCoolDown;
+        _ufoCapacity =  _config.UFOCapacity;
+        _asteroidsCapacity = _config.AsteroidsCapacity;
+        _fragmentsPoolCapacity = _config.FragmentsCapacity;
         _signalBus = signalBus;
         _target = player.transform;
         _ufoPool = new ObjectPool<UFO>(_ufoCapacity, _ufoPrefab, _ufoContainer);

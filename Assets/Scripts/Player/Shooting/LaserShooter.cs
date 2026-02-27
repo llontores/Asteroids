@@ -36,30 +36,6 @@ public class LaserShooter : IInitializable, IDisposable
     {
         _player = player;
         _signalBus = signalBus;
-        _lineRenderer = _player.LineRenderer;
-        _maxDistance = _player.MaxRayDistance;
-        _shootPoint = _player.ShootPoint;
-        _laserDuration = _player.LaserDuration;
-        _layerMaskIgnore = _player.LayerMaskIgnore;
-        _cooldown = _player.LaserCooldown;
-        _maxAmmoCount = _player.MaxLaserAmmoCount;
-        _currentAmmoCount = _maxAmmoCount;
-        _ammoReloadCooldown = _player.LaserReloadCooldown;
-        _reloadCts = new CancellationTokenSource();
-        _camera = Camera.main;
-
-        // Рассчитываем границы экрана один раз
-        Vector3 bottomLeft = _camera.ViewportToWorldPoint(new Vector3(0, 0, 0));
-        Vector3 topRight = _camera.ViewportToWorldPoint(new Vector3(1, 1, 0));
-        _minX = bottomLeft.x;
-        _maxX = topRight.x;
-        _minY = bottomLeft.y;
-        _maxY = topRight.y;
-        
-        if (_lineRenderer != null) 
-            _lineRenderer.enabled = false;
-
-        _lastShootTime = -_cooldown; 
     }
 
     private void ShootLaser() => ShootLaserRoutine().Forget();
@@ -165,6 +141,29 @@ public class LaserShooter : IInitializable, IDisposable
     {
         _signalBus.Subscribe<LaserShootSignal>(ShootLaser);
         LaserTurnedOff?.Invoke();
+        _lineRenderer = _player.LineRenderer;
+        _maxDistance = _player.Config.MaxRayDistance;
+        _shootPoint = _player.ShootPoint;
+        _laserDuration = _player.Config.LaserDuration;
+        _layerMaskIgnore = _player.LayerMaskIgnore;
+        _cooldown = _player.Config.LaserCooldown;
+        _maxAmmoCount = _player.Config.MaxLaserAmmoCount;
+        _currentAmmoCount = _maxAmmoCount;
+        _ammoReloadCooldown = _player.Config.LaserReloadCooldown;
+        _reloadCts = new CancellationTokenSource();
+        _camera = Camera.main;
+        
+        Vector3 bottomLeft = _camera.ViewportToWorldPoint(new Vector3(0, 0, 0));
+        Vector3 topRight = _camera.ViewportToWorldPoint(new Vector3(1, 1, 0));
+        _minX = bottomLeft.x;
+        _maxX = topRight.x;
+        _minY = bottomLeft.y;
+        _maxY = topRight.y;
+        
+        if (_lineRenderer != null) 
+            _lineRenderer.enabled = false;
+
+        _lastShootTime = -_cooldown; 
     }
 
     public void Dispose()

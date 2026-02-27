@@ -3,15 +3,14 @@ using UnityEngine.Events;
 
 public class Bullet : MonoBehaviour, IDestroyable
 {
-    [SerializeField] private float _maxSpeed;
-    [SerializeField] private float _thrust;
-    [SerializeField] private float _dragForce;
-
     public event UnityAction<Bullet> OnBulletDestroyed;
-    
     private Physics _physics;
     private Vector2 _velocity;
     private bool _isUsed;
+    private BulletConfig _config;
+    private float _maxSpeed;
+    private float _thrust;
+    private float _dragForce;
 
     private void OnEnable()
     {
@@ -21,6 +20,11 @@ public class Bullet : MonoBehaviour, IDestroyable
 
     private void Awake()
     {
+        var config = JsonConfigLoader.LoadFromResources<BulletConfig>("Configs/bullet_config");
+        _config = config;
+        _maxSpeed = config.MaxSpeed;
+        _thrust = config.Thrust;
+        _dragForce = config.DragForce;
         _physics = new Physics(_thrust, _dragForce, _maxSpeed, 0);
     } 
 

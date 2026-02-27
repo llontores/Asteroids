@@ -7,15 +7,15 @@ public class Fragment : Entity, IDestroyable
 {
     private const int MaxDegree = 360;
     
-    [SerializeField] private float _impulceForce;
-    [SerializeField] private float _dragForce;
-    [SerializeField] private float _maxSpeed;
-    [SerializeField] private float _bounceForce;
-    
     public event UnityAction<Fragment> OnDestroy;
     
+    private float _impulceForce;
+    private float _dragForce;
+    private float _maxSpeed;
+    private float _bounceForce;
     private Physics _physics;
     private Vector2 _velocity;
+    private FragmentConfig _config;
 
     private void OnEnable()
     {
@@ -25,6 +25,12 @@ public class Fragment : Entity, IDestroyable
 
     private void Awake()
     {
+        _config = JsonConfigLoader.LoadFromResources<FragmentConfig>("Configs/fragment_config");
+        _impulceForce = _config.ImpulseForce;
+        _dragForce = _config.DragForce;
+        _maxSpeed = _config.MaxSpeed;
+        _bounceForce = _config.BounceForce;
+        _reward = _config.Reward;
         _physics = new Physics(_impulceForce, _dragForce, _maxSpeed, _bounceForce);
     }
 

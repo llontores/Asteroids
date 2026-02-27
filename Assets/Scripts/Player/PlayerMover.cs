@@ -16,9 +16,6 @@ public class PlayerMover : IInitializable, IDisposable, ITickable
     {
         _player = player;
         _signalBus = signalBus;
-        _turnSpeed = _player.TurnSpeed;
-        _playerTransform = _player.transform;
-        _physics = new Physics(_player.Thrust, _player.DragForce, _player.MaxSpeed, _player.BounceForce);
     }
 
     public void Initialize()
@@ -26,6 +23,9 @@ public class PlayerMover : IInitializable, IDisposable, ITickable
         _signalBus.Subscribe<AccelerationSignal>(Accelerate);
         _signalBus.Subscribe<TurnSignal>(Turn);
         _player.OnTriggerEntered += Bounce;
+        _turnSpeed = _player.Config.TurnSpeed;
+        _playerTransform = _player.transform;
+        _physics = new Physics(_player.Config.Thrust, _player.Config.DragForce, _player.Config.MaxSpeed, _player.Config.BounceForce);
     }
 
     public void Dispose()

@@ -17,17 +17,17 @@ public class PlayerModel : IInitializable, IDisposable
     public void Construct(Player player)
     {
         _player = player;
-        _polygonCollider2D = _player.PolygonCollider2D;
-        _invulnerabilityDuration = _player.InvulnerabilityDuration;
-        _invulnerabilityCoolDown = _player.InvulnerabilityCoolDown;
-        _cancellationTokenSource = new CancellationTokenSource();
-        _invulnerableCircle = _player.InvulnerableEffectCircle;
     }
 
     public void Initialize()
     {
         _player.OnTriggerEntered += StartInvulnerability;
+        _invulnerableCircle = _player.InvulnerableEffectCircle;
         _invulnerableCircle.gameObject.SetActive(false);
+        _polygonCollider2D = _player.PolygonCollider2D;
+        _invulnerabilityDuration = _player.Config.InvulnerabilityDuration;
+        _invulnerabilityCoolDown = _player.Config.InvulnerabilityCoolDown;
+        _cancellationTokenSource = new CancellationTokenSource();
     }
 
     public void Dispose()

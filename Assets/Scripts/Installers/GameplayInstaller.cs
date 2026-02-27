@@ -7,14 +7,16 @@ public class GameplayInstaller : MonoInstaller
     public override void InstallBindings()
     {
         SignalBusInstaller.Install(Container);
-
+        var config = JsonConfigLoader.LoadFromResources<PlayerConfig>("Configs/player_config");
+        
         Container.DeclareSignal<AccelerationSignal>();
         Container.DeclareSignal<TurnSignal>();
         Container.DeclareSignal<BulletShootSignal>();
         Container.DeclareSignal<LaserShootSignal>();
         Container.DeclareSignal<DestroyableDiedSignal>();
-
-        Container.Bind<Player>().FromComponentInHierarchy().AsSingle();
+        
+        Container.Bind<PlayerConfig>().FromInstance(config).AsSingle();
+        Container.Bind<Player>().FromComponentInHierarchy().AsSingle().NonLazy();
         Container.Bind<MobileButtonsHandler>().FromComponentInHierarchy().AsSingle();
         Container.BindInterfacesAndSelfTo<RewardCounter>().AsSingle().NonLazy();
         Container.Bind<HazardSpawner>().FromComponentInHierarchy().AsSingle();

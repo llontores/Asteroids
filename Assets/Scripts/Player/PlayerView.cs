@@ -17,14 +17,14 @@ public class PlayerView : IInitializable, IDisposable
     {
         _player = player;
         _signalBus = signalBus;
-        _animator = _player.Animator;
-        _bulletShootParticles = _player.BulletShootParticles;
     }
 
     public void Initialize()
     {
         _signalBus.Subscribe<AccelerationSignal>(ManageAccelerationAnimation);
         _signalBus.Subscribe<BulletShootSignal>(EmitBulletShootParticles);
+        _animator = _player.Animator;
+        _bulletShootParticles = _player.BulletShootParticles;
     }
 
     public void Dispose()

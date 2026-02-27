@@ -1,0 +1,9 @@
+﻿{
+  "Thrust": 20,
+  "Drag": 0,
+  "MaxSpeed": 6,
+  "SpinningMinSpeed": 50,
+  "SpinningMaxSpeed": 100,
+  "BounceForce": 15,
+  "Reward": 6
+}

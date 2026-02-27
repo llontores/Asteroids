@@ -1,0 +1,11 @@
+﻿{
+  "Thrust": 20,
+  "Drag": 0,
+  "MaxSpeed": 6,
+  "SpinningMinSpeed": 100,
+  "SpinningMaxSpeed": 200,
+  "MinFragmentAmount": 2,
+  "MaxFragmentAmount": 4,
+  "BounceForce": 15,
+  "Reward": 5
+}

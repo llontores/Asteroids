@@ -1,0 +1,7 @@
+﻿{
+  "ImpulseForce": 300.0,
+  "DragForce": 0.15,
+  "MaxSpeed": 300.0,
+  "BounceForce": 5.0,
+  "Reward": 2
+}

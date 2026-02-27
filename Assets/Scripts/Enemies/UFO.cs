@@ -5,25 +5,33 @@ public class UFO : Entity, IDestroyable
 {
     private const int LeftTurnIndex = 1;
     private const int RightTurnIndex = -1;
-
-    [SerializeField] private float _thrust;
-    [SerializeField] private float _drag;
-    [SerializeField] private float _maxSpeed;
-    [SerializeField] private float _spinningMinSpeed;
-    [SerializeField] private float _spinningMaxSpeed;
-    [SerializeField] private float _bounceForce;
     
     public event UnityAction<UFO> OnDestroy;
+    
+    private float _thrust;
+    private float _drag;
+    private float _maxSpeed;
+    private float _spinningMinSpeed;
+    private float _spinningMaxSpeed;
+    private float _bounceForce;
     private int _spinningTurn;
     private float _spinningSpeed;
     private Vector2 _velocity;
     private Physics _physics;
     private Vector3 _direction;
     private Transform _target;
+    private UFOConfig _config;
     
-    
-    private void Start()
+    private void Awake()
     {
+        _config = JsonConfigLoader.LoadFromResources<UFOConfig>("Configs/ufo_config");
+        _thrust = _config.Thrust;
+        _drag = _config.Drag;
+        _maxSpeed = _config.MaxSpeed;
+        _spinningMinSpeed = _config.SpinningMinSpeed;
+        _spinningMaxSpeed = _config.SpinningMaxSpeed;
+        _bounceForce = _config.BounceForce;
+        _reward = _config.Reward;
         _physics = new Physics(_thrust, _drag, _maxSpeed, _bounceForce);
         _spinningSpeed = Random.Range(_spinningMinSpeed, _spinningMaxSpeed + 1);
         _spinningTurn = Random.Range(RightTurnIndex, LeftTurnIndex + 1);

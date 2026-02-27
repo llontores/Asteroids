@@ -16,12 +16,10 @@ public class BulletsShooter : IInitializable, IDisposable
     public ObjectPool<Bullet> BulletPool {get; private set; }
 
     [Inject]
-    public void Construct(Player player, SignalBus signalBus, BulletsContainer  bulletsContainer)
+    public void Construct(Player player, SignalBus signalBus, BulletsContainer bulletsContainer)
     {
         _player = player;
         _signalBus = signalBus;
-        _shootPoint = _player.ShootPoint;
-        _bulletShootCooldown = _player.BulletsShootCooldown;
         _bulletPrefab = _player.BulletPrefab;
         BulletPool = new ObjectPool<Bullet>(10, _bulletPrefab, bulletsContainer.transform);
     }
@@ -29,6 +27,8 @@ public class BulletsShooter : IInitializable, IDisposable
     public void Initialize()
     {
         _signalBus.Subscribe<BulletShootSignal>(FireBullets);
+        _shootPoint = _player.ShootPoint;
+        _bulletShootCooldown = _player.Config.BulletsShootCooldown;
     }
 
     public void Dispose()

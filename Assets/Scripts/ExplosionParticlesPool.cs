@@ -9,17 +9,21 @@ public class ExplosionParticlesPool : MonoBehaviour
 {
     [SerializeField] private ParticleSystem _explosionParticles;
     [SerializeField] private Transform _particlesSystemContainer;
-    [SerializeField] private int _particlesContainerCapacity;
-
+    
+    private int _particlesContainerCapacity;
     private ObjectPool<ParticleSystem> _particlesPool;
     private CancellationTokenSource _particlesPoolCts;
     private float _effectDuration;
     private SignalBus _signalBus;
+    private ExplosionParticlesPoolConfig _config;
 
     [Inject]
     public void Construct(SignalBus signalBus)
     {
         _signalBus = signalBus;
+        _config = JsonConfigLoader.LoadFromResources<ExplosionParticlesPoolConfig>(
+            "Configs/explosionParticlesPool_config");
+        _particlesContainerCapacity =  _config.Capacity;
         _signalBus.Subscribe<DestroyableDiedSignal>(SetParticles);
         _particlesPool = new ObjectPool<ParticleSystem>(_particlesContainerCapacity, _explosionParticles,
             _particlesSystemContainer);
