@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "212103066142",
+    "project_id": "asteroids-7a5e9",
+    "storage_bucket": "asteroids-7a5e9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:212103066142:android:ae718f557636a85637740f",
+        "android_client_info": {
+          "package_name": "asteroids.llontores"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAf3LPnjd71ViXFYN7Lg7DKkjXAP22amIs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

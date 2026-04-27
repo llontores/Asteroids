@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4214624049453490778}
   - component: {fileID: -5596255906645045456}
   - component: {fileID: 412714574499381131}
+  - component: {fileID: -4865358172092282848}
   m_Layer: 0
   m_Name: ufo
   m_TagString: Untagged
@@ -47,13 +48,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4654fc84f5424544aab586c78ed50d47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _thrust: 20
-  _drag: 0
-  _maxSpeed: 6
-  _reward: 7
-  _spinningMinSpeed: 50
-  _spinningMaxSpeed: 100
-  _bounceForce: 15
 --- !u!212 &4214624049453490778
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -168,3 +162,16 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 1.805
+--- !u!114 &-4865358172092282848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1521550363353698102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 717a02054ef2699498e6bd4234fd7995, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _containerSource: 0

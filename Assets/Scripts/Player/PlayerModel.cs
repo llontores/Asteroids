@@ -12,11 +12,13 @@ public class PlayerModel : IInitializable, IDisposable
     private int _invulnerabilityDuration;
     private int _invulnerabilityCoolDown;
     private InvulnerableCircle _invulnerableCircle;
+    private SignalBus _signalBus;
 
     [Inject]
-    public void Construct(Player player)
+    public void Construct(Player player, SignalBus signalBus)
     {
         _player = player;
+        _signalBus = signalBus;
     }
 
     public void Initialize()
@@ -27,34 +29,63 @@ public class PlayerModel : IInitializable, IDisposable
         _polygonCollider2D = _player.PolygonCollider2D;
         _invulnerabilityDuration = _player.Config.InvulnerabilityDuration;
         _invulnerabilityCoolDown = _player.Config.InvulnerabilityCoolDown;
-        _cancellationTokenSource = new CancellationTokenSource();
+        _signalBus.Subscribe<RestartButtonPressedSignal>(Reset);
     }
 
     public void Dispose()
     {
         _player.OnTriggerEntered -= StartInvulnerability;
-        _cancellationTokenSource.Cancel();
-        _cancellationTokenSource.Dispose();
+        _signalBus.Unsubscribe<RestartButtonPressedSignal>(Reset);
+        CancelToken();
     }
 
     private void StartInvulnerability(Collider2D collision)
     {
-        TurnOffCollider().Forget();
+        if (_polygonCollider2D.enabled)
+        {
+            TurnOffCollider().Forget();
+        }
     }
 
     private async UniTaskVoid TurnOffCollider()
     {
-        _polygonCollider2D.enabled = false;
-        _invulnerableCircle.gameObject.SetActive(true);
-        _player.ChangeInvelnurabilityStatus(true);
+        CancelToken();
+        _cancellationTokenSource = new CancellationTokenSource();
+        var token = _cancellationTokenSource.Token;
 
-        await UniTask.Delay(_invulnerabilityDuration, cancellationToken: _cancellationTokenSource.Token);
-    
-        _player.ChangeInvelnurabilityStatus(false); 
-        _invulnerableCircle.gameObject.SetActive(false);
-        
-        await UniTask.Delay(_invulnerabilityCoolDown, cancellationToken: _cancellationTokenSource.Token);
-        
+        try
+        {
+            _polygonCollider2D.enabled = false;
+            _invulnerableCircle.gameObject.SetActive(true);
+            _player.ChangeInvelnurabilityStatus(true);
+
+            await UniTask.Delay(_invulnerabilityDuration, cancellationToken: token);
+
+            _player.ChangeInvelnurabilityStatus(false);
+            _invulnerableCircle.gameObject.SetActive(false);
+
+            await UniTask.Delay(_invulnerabilityCoolDown, cancellationToken: token);
+
+            _polygonCollider2D.enabled = true;
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    private void Reset()
+    {
+        CancelToken();
         _polygonCollider2D.enabled = true;
+        _invulnerableCircle.gameObject.SetActive(false);
+        _player.ChangeInvelnurabilityStatus(false);
+    }
+
+    private void CancelToken()
+    {
+        if (_cancellationTokenSource != null)
+        {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+            _cancellationTokenSource = null;
+        }
     }
 }

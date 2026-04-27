@@ -11,7 +11,7 @@ public class PlayerConfig
     public float LaserDuration;
     public float MaxRayDistance;
     public float LaserCooldown;
-    public float MaxLaserAmmoCount;
+    public int MaxLaserAmmoCount;
     public float LaserReloadCooldown;
     public float BounceForce;
     public int InvulnerabilityDuration;

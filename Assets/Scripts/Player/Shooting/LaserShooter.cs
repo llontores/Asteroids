@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Signals;
 using UnityEngine;
-using UnityEngine.Events;
 using Zenject;
 
 public class LaserShooter : IInitializable, IDisposable
@@ -16,26 +14,69 @@ public class LaserShooter : IInitializable, IDisposable
     private LayerMask _layerMaskIgnore;
     private float _cooldown;
     private float _lastShootTime;
-    private float _currentAmmoCount;
-    private float _maxAmmoCount;
+    private int _currentAmmoCount;
+    private int _maxAmmoCount;
     private float _ammoReloadCooldown;
+    private int _shootedAmount;
     private Player _player;
     private CancellationTokenSource _shootCts;
     private CancellationTokenSource _reloadCts;
     private readonly RaycastHit2D[] _hitsBuffer = new RaycastHit2D[10];
     private Camera _camera;
-    
-    // Границы экрана в мировых координатах
+    private float _reloadRemainingTime;
     private float _minX, _maxX, _minY, _maxY;
 
-    public event UnityAction<Vector3> LaserEndPointUpdated;
-    public event UnityAction LaserTurnedOff;
     
     [Inject]
     public void Construct(SignalBus signalBus, Player player)
     {
+        _reloadRemainingTime = 0;
         _player = player;
         _signalBus = signalBus;
+        _signalBus.Fire(new LaserReloadRemainingTimeChangedSIgnal{RemainingTime = _reloadRemainingTime});
+    }
+    
+    public void Initialize()
+    {
+        _signalBus.Subscribe<LaserShootSignal>(ShootLaser);
+        _signalBus.Fire(new LaserTurnedOffSignal());
+        _lineRenderer = _player.LineRenderer;
+        _maxDistance = _player.Config.MaxRayDistance;
+        _shootPoint = _player.ShootPoint;
+        _laserDuration = _player.Config.LaserDuration;
+        _layerMaskIgnore = _player.LayerMaskIgnore;
+        _cooldown = _player.Config.LaserCooldown;
+        _maxAmmoCount = _player.Config.MaxLaserAmmoCount;
+        _currentAmmoCount = _maxAmmoCount;
+        _signalBus.Fire(new LaserRemainingAmmoCountUpdatedSignal{AmmoCount = _currentAmmoCount});
+        _signalBus.Fire(new LaserReloadRemainingTimeChangedSIgnal{RemainingTime = 0});
+        _signalBus.Subscribe<RestartButtonPressedSignal>(ResetLaser);
+        
+        _ammoReloadCooldown = _player.Config.LaserReloadCooldown;
+        _reloadCts = new CancellationTokenSource();
+        _camera = Camera.main;
+        
+        Vector3 bottomLeft = _camera.ViewportToWorldPoint(new Vector3(0, 0, 0));
+        Vector3 topRight = _camera.ViewportToWorldPoint(new Vector3(1, 1, 0));
+        _minX = bottomLeft.x;
+        _maxX = topRight.x;
+        _minY = bottomLeft.y;
+        _maxY = topRight.y;
+        
+        if (_lineRenderer != null) 
+            _lineRenderer.enabled = false;
+
+        _lastShootTime = -_cooldown; 
+    }
+
+    public void Dispose()
+    {
+        _signalBus.Unsubscribe<LaserShootSignal>(ShootLaser);
+        _signalBus.Unsubscribe<RestartButtonPressedSignal>(ResetLaser);
+        _shootCts?.Cancel();
+        _shootCts?.Dispose();
+        _reloadCts?.Cancel(); 
+        _reloadCts?.Dispose();
     }
 
     private void ShootLaser() => ShootLaserRoutine().Forget();
@@ -45,10 +86,20 @@ public class LaserShooter : IInitializable, IDisposable
         if (Time.time < _lastShootTime + _cooldown || _currentAmmoCount == 0 || _player.IsInvulnerable)
             return;
 
-        if (_shootCts != null) { _shootCts.Cancel(); _shootCts.Dispose(); }
+        if (_shootCts != null)
+        {
+            _shootCts.Cancel(); 
+            _shootCts.Dispose();
+        }
 
         _currentAmmoCount = Mathf.Clamp(_currentAmmoCount - 1, 0, _maxAmmoCount);
-        ReloadLaserAmmo().Forget();
+        _signalBus.Fire(new LaserRemainingAmmoCountUpdatedSignal{AmmoCount = _currentAmmoCount});
+        
+        if (_currentAmmoCount == 0)
+        {
+            ReloadLaserAmmo().Forget();
+        }
+        
         _lastShootTime = Time.time;
         _shootCts = new CancellationTokenSource();
         var token = _shootCts.Token;
@@ -63,7 +114,8 @@ public class LaserShooter : IInitializable, IDisposable
                 elapsedTime += Time.deltaTime;
                 await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
-            LaserTurnedOff?.Invoke();
+            _signalBus.Fire(new LaserTurnedOffSignal());
+
         }
         catch (OperationCanceledException) { }
         finally
@@ -75,36 +127,43 @@ public class LaserShooter : IInitializable, IDisposable
 
     private async UniTaskVoid ReloadLaserAmmo()
     {
-        float elapsedTIme = 0;
-        while (elapsedTIme < _ammoReloadCooldown)
+        _reloadRemainingTime = _ammoReloadCooldown;
+        while (_reloadRemainingTime > 0)
         {
-            elapsedTIme += Time.deltaTime;
+            _reloadRemainingTime -= Time.deltaTime;
+           _signalBus.Fire(new LaserReloadRemainingTimeChangedSIgnal{RemainingTime = _reloadRemainingTime});
+            
             await UniTask.Yield(PlayerLoopTiming.Update, _reloadCts.Token);
         }
-        _currentAmmoCount = Mathf.Clamp(_currentAmmoCount + 1, 0, _maxAmmoCount);
-    }
+        _currentAmmoCount = _maxAmmoCount;
+        _signalBus.Fire(new LaserReloadRemainingTimeChangedSIgnal{RemainingTime = 0});
+        _signalBus.Fire(new LaserRemainingAmmoCountUpdatedSignal{AmmoCount = _currentAmmoCount});
+        
+        }
 
     private void UpdateLaser()
     {
         Vector2 origin = _shootPoint.position;
-        Vector2 direction = _shootPoint.up; // Стреляем "вверх" от дула
-
-        // 1. Находим потенциальную конечную точку лазера
+        Vector2 direction = _shootPoint.up;
+        
         Vector2 targetEnd = origin + direction * _maxDistance;
+        
+        float distanceMultiplier = 1f;
 
-        // 2. Ограничиваем эту точку границами экрана
-        // Чтобы луч не "ломался", мы вычисляем, какой множитель (t) нужен, чтобы коснуться края
-        float t = 1f;
-
-        if (targetEnd.x < _minX) t = Mathf.Min(t, (_minX - origin.x) / (targetEnd.x - origin.x));
-        if (targetEnd.x > _maxX) t = Mathf.Min(t, (_maxX - origin.x) / (targetEnd.x - origin.x));
-        if (targetEnd.y < _minY) t = Mathf.Min(t, (_minY - origin.y) / (targetEnd.y - origin.y));
-        if (targetEnd.y > _maxY) t = Mathf.Min(t, (_maxY - origin.y) / (targetEnd.y - origin.y));
-
-        // Обновленная дистанция с учетом краев экрана
-        float clampedDistance = _maxDistance * t;
-
-        // 3. Физическая проверка (Raycast)
+        if (targetEnd.x < _minX)
+            distanceMultiplier = Mathf.Min(distanceMultiplier, (_minX - origin.x) / (targetEnd.x - origin.x));
+        
+        if (targetEnd.x > _maxX) 
+            distanceMultiplier = Mathf.Min(distanceMultiplier, (_maxX - origin.x) / (targetEnd.x - origin.x));
+        
+        if (targetEnd.y < _minY) 
+            distanceMultiplier = Mathf.Min(distanceMultiplier, (_minY - origin.y) / (targetEnd.y - origin.y));
+        
+        if (targetEnd.y > _maxY) 
+            distanceMultiplier = Mathf.Min(distanceMultiplier, (_maxY - origin.y) / (targetEnd.y - origin.y));
+        
+        float clampedDistance = _maxDistance * distanceMultiplier;
+        
         int hitCount = Physics2D.RaycastNonAlloc(origin, direction, _hitsBuffer, clampedDistance, ~_layerMaskIgnore);
 
         Vector2 finalPoint;
@@ -134,42 +193,13 @@ public class LaserShooter : IInitializable, IDisposable
         _lineRenderer.SetPosition(0, new Vector3(origin.x, origin.y, -0.1f));
         _lineRenderer.SetPosition(1, renderPoint);
         
-        LaserEndPointUpdated?.Invoke(renderPoint);
+        _signalBus.Fire(new LaserEndPointUpdatedSignal{LaserEndPoint = renderPoint});
     }
 
-    public void Initialize()
+    private void ResetLaser()
     {
-        _signalBus.Subscribe<LaserShootSignal>(ShootLaser);
-        LaserTurnedOff?.Invoke();
-        _lineRenderer = _player.LineRenderer;
-        _maxDistance = _player.Config.MaxRayDistance;
-        _shootPoint = _player.ShootPoint;
-        _laserDuration = _player.Config.LaserDuration;
-        _layerMaskIgnore = _player.LayerMaskIgnore;
-        _cooldown = _player.Config.LaserCooldown;
-        _maxAmmoCount = _player.Config.MaxLaserAmmoCount;
+        _reloadRemainingTime = 0;
         _currentAmmoCount = _maxAmmoCount;
-        _ammoReloadCooldown = _player.Config.LaserReloadCooldown;
-        _reloadCts = new CancellationTokenSource();
-        _camera = Camera.main;
-        
-        Vector3 bottomLeft = _camera.ViewportToWorldPoint(new Vector3(0, 0, 0));
-        Vector3 topRight = _camera.ViewportToWorldPoint(new Vector3(1, 1, 0));
-        _minX = bottomLeft.x;
-        _maxX = topRight.x;
-        _minY = bottomLeft.y;
-        _maxY = topRight.y;
-        
-        if (_lineRenderer != null) 
-            _lineRenderer.enabled = false;
-
-        _lastShootTime = -_cooldown; 
-    }
-
-    public void Dispose()
-    {
-        _signalBus.TryUnsubscribe<LaserShootSignal>(ShootLaser);
-        _shootCts?.Cancel(); _shootCts?.Dispose();
-        _reloadCts?.Cancel(); _reloadCts?.Dispose();
+        _signalBus.Fire(new LaserRemainingAmmoCountUpdatedSignal{AmmoCount = _currentAmmoCount});
     }
 }

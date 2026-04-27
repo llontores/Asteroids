@@ -1,5 +1,4 @@
-﻿using Signals;
-using Zenject;
+﻿using Zenject;
 using UnityEngine;
 
 
@@ -14,10 +13,10 @@ public class DesktopInput : InputHandler, ITickable
     public void Tick()
     {
         if (Input.GetKeyUp(KeyCode.W))
-            FireAcceleration(false);
+            FireAcceleration(0);
 
         if (Input.GetKey(KeyCode.W))
-            FireAcceleration(true);
+            FireAcceleration(1);
 
         if (Input.GetKey(KeyCode.A))
             FireRotation(1);

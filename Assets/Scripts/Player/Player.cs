@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 using Zenject;
 
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(PolygonCollider2D))]
-public class Player : MonoBehaviour, IInitializable
+public class Player : MonoBehaviour, IWrappable
 {
     [SerializeField] private Animator _animator;
     [SerializeField] private Renderer _renderer;
@@ -16,9 +17,11 @@ public class Player : MonoBehaviour, IInitializable
     [SerializeField] private PolygonCollider2D _polygonCollider2D;
     [SerializeField] private ParticleSystem _bulletShootParticles;
     [SerializeField] private InvulnerableCircle _invulnerableEffectCircle;
-    
-    private int _currentHealth;
 
+    private int _currentHealth;
+    private SignalBus _signalBus;
+
+    public Transform Transform => transform;
     public PlayerConfig Config { get; private set; }
     public event UnityAction<Collider2D> OnTriggerEntered;
     public Animator Animator => _animator;
@@ -34,29 +37,49 @@ public class Player : MonoBehaviour, IInitializable
     public InvulnerableCircle InvulnerableEffectCircle => _invulnerableEffectCircle;
 
     [Inject]
-    public void Construct(PlayerConfig config)
+    public void Construct(SignalBus signalBus)
     {
-        Config = config;
-        _currentHealth =  Config.MaxHealth;
+        _signalBus = signalBus;
+    }
+
+    private void Awake()
+    {
+        Config = JsonConfigLoader.LoadFromResources<PlayerConfig>("Configs/player_config");
+        _currentHealth = Config.MaxHealth;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(IsInvulnerable)
+        if (IsInvulnerable)
             return;
-        
-        if(collision.TryGetComponent<Bullet>(out Bullet _))
+
+        if (collision.TryGetComponent<Bullet>(out Bullet _))
             return;
-            OnTriggerEntered?.Invoke(collision);
-            _currentHealth = Mathf.Clamp(_currentHealth - 1, 0, Config.MaxHealth);
+
+        OnTriggerEntered?.Invoke(collision);
+        _currentHealth = Mathf.Clamp(_currentHealth - 1, 0, Config.MaxHealth);
+
+        if (_currentHealth <= 0)
+            _signalBus.Fire(new PlayerDeadSignal());
+    }
+
+    private void OnEnable()
+    {
+        _signalBus.Subscribe<RestartButtonPressedSignal>(ResetHealth);
+    }
+
+    private void OnDisable()
+    {
+        _signalBus.Unsubscribe<RestartButtonPressedSignal>(ResetHealth);
     }
 
     public void ChangeInvelnurabilityStatus(bool status)
+        {
+            IsInvulnerable = status;
+        }
+    
+    private void ResetHealth()
     {
-        IsInvulnerable = status;
-    }
-
-    public void Initialize()
-    {
+        _currentHealth = Config.MaxHealth;
     }
 }

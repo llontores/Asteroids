@@ -1,5 +1,4 @@
 using System;
-using Signals;
 using UnityEngine;
 using Zenject;
 
@@ -35,7 +34,7 @@ public class PlayerView : IInitializable, IDisposable
 
     private void ManageAccelerationAnimation(AccelerationSignal args)
     {
-        _animator.SetBool(AcceleratingState, args.IsPressed);
+        _animator.SetBool(AcceleratingState, args.Power > 0f);
     }
 
     private void EmitBulletShootParticles()

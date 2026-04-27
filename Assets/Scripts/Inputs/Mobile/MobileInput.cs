@@ -10,32 +10,30 @@ public class MobileInput : InputHandler, IDisposable
     {
         _handler = handler;
         _handler.gameObject.SetActive(true);
-        _handler.Accelerate.ButtonPressed += AccelerationButtonPressed;
-        _handler.Accelerate.ButtonReleased += AccelerationButtonReleased;
-        _handler.TurnLeft.ButtonPressed += TurnLeftButtonPressed;
-        _handler.TurnRight.ButtonPressed += TurnRightButtonPressed;
+        
+        _handler.Joystick.OnAccelerateChanged += AccelerationChanged;
+        _handler.Joystick.OnTurnChanged += TurnChanged;
+
         _handler.ShootBullet.ButtonPressed += ShootBulletButtonPressed;
         _handler.ShootLaser.ButtonPressed += ShootLaserButtonPressed;
     }
 
-    private void AccelerationButtonPressed()
+    public void Dispose()
     {
-        FireAcceleration(true);
+        _handler.Joystick.OnAccelerateChanged -= AccelerationChanged;
+        _handler.Joystick.OnTurnChanged -= TurnChanged;
+        _handler.ShootBullet.ButtonPressed -= ShootBulletButtonPressed;
+        _handler.ShootLaser.ButtonPressed -= ShootLaserButtonPressed;
+    }
+    
+    private void AccelerationChanged(float power)
+    {
+        FireAcceleration(power); 
     }
 
-    private void AccelerationButtonReleased()
+    private void TurnChanged(int turnDirection)
     {
-        FireAcceleration(false);
-    }
-
-    private void TurnLeftButtonPressed()
-    {
-        FireRotation(1);
-    }
-
-    private void TurnRightButtonPressed()
-    {
-        FireRotation(-1);
+        FireRotation(turnDirection); 
     }
 
     private void ShootBulletButtonPressed()
@@ -46,15 +44,5 @@ public class MobileInput : InputHandler, IDisposable
     private void ShootLaserButtonPressed()
     {
         FireLaserShot();
-    }
-
-    public void Dispose()
-    {
-        _handler.Accelerate.ButtonPressed -= AccelerationButtonPressed;
-        _handler.Accelerate.ButtonReleased -= AccelerationButtonReleased;
-        _handler.TurnLeft.ButtonPressed -= TurnLeftButtonPressed;
-        _handler.TurnRight.ButtonPressed -= TurnRightButtonPressed;
-        _handler.ShootBullet.ButtonPressed -= ShootBulletButtonPressed;
-        _handler.ShootLaser.ButtonPressed -= ShootLaserButtonPressed;
     }
 }

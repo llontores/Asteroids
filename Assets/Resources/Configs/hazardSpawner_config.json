@@ -1,7 +1,7 @@
 ﻿{
   "MinCoolDown": 1000,
   "MaxCoolDown": 2000,
-  "UFOCapacity" 10,
+  "UFOCapacity": 10,
   "AsteroidsCapacity": 10,
-  "FragmentsCapacity" 20
+  "FragmentsCapacity": 20
 }

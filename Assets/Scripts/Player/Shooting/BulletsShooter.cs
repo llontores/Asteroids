@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
-using Signals;
 using UnityEngine;
 using Zenject;
 
@@ -13,6 +13,7 @@ public class BulletsShooter : IInitializable, IDisposable
     private Bullet _bulletPrefab;
     private bool _canShootBullets = true;
     private Player _player;
+    private CancellationTokenSource _cancellationToken;
     public ObjectPool<Bullet> BulletPool {get; private set; }
 
     [Inject]
@@ -29,11 +30,14 @@ public class BulletsShooter : IInitializable, IDisposable
         _signalBus.Subscribe<BulletShootSignal>(FireBullets);
         _shootPoint = _player.ShootPoint;
         _bulletShootCooldown = _player.Config.BulletsShootCooldown;
+        _cancellationToken = new CancellationTokenSource();
     }
 
     public void Dispose()
     {
         _signalBus.Unsubscribe<BulletShootSignal>(FireBullets);
+        _cancellationToken.Cancel();
+        _cancellationToken.Dispose();
     }
 
     private void FireBullets()
@@ -50,12 +54,12 @@ public class BulletsShooter : IInitializable, IDisposable
         }
         
         _canShootBullets =  false;
-        BulletsCooldown();
+        BulletsCooldown().Forget();
     }
 
     private async UniTaskVoid BulletsCooldown()
     {
-        await UniTask.Delay(_bulletShootCooldown);
+        await UniTask.Delay(_bulletShootCooldown, cancellationToken: _cancellationToken.Token);
         _canShootBullets = true;
     }
     

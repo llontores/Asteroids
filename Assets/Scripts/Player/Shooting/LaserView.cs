@@ -6,19 +6,21 @@ public class LaserView : MonoBehaviour
     [SerializeField] private ParticleSystem _endPointEffect;
 
     private LaserShooter _shooter;
+    private SignalBus _signalBus;
 
     [Inject]
-    public void Construct(LaserShooter shooter)
+    public void Construct(LaserShooter shooter, SignalBus signalBus)
     {
         _shooter = shooter;
-        _shooter.LaserEndPointUpdated += ShowLaserEffect;
-        _shooter.LaserTurnedOff += HideLaserEffect;
+        _signalBus = signalBus;
+        _signalBus.Subscribe<LaserEndPointUpdatedSignal>(ShowLaserEffect);
+        _signalBus.Subscribe<LaserTurnedOffSignal>(HideLaserEffect);
     }
 
-    private void ShowLaserEffect(Vector3 position)
+    private void ShowLaserEffect(LaserEndPointUpdatedSignal args)
     {
         _endPointEffect.gameObject.SetActive(true);
-        _endPointEffect.transform.position = position;
+        _endPointEffect.transform.position = args.LaserEndPoint;
     }
 
     private void HideLaserEffect()
@@ -28,7 +30,7 @@ public class LaserView : MonoBehaviour
 
     private void OnDisable()
     {
-        _shooter.LaserEndPointUpdated -= ShowLaserEffect;
-        _shooter.LaserTurnedOff -= HideLaserEffect;
+        _signalBus.Unsubscribe<LaserEndPointUpdatedSignal>(ShowLaserEffect);
+        _signalBus.Unsubscribe<LaserTurnedOffSignal>(HideLaserEffect);
     }
 }

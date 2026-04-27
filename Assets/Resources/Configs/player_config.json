@@ -1,16 +1,16 @@
-﻿{
-  "Thrust": 15,
+{
+  "Thrust": 15.0,
   "DragForce": 1.5,
-  "MaxSpeed": 10,
-  "TurnSpeed": 360,
+  "MaxSpeed": 10.0,
+  "TurnSpeed": 360.0,
   "BulletsShootCooldown": 100,
   "LaserDuration": 0.3,
-  "MaxRayDistance": 100,
+  "MaxRayDistance": 100.0,
   "LaserCooldown": 0.3,
-  "MaxLaserAmmoCount": 10,
-  "LaserReloadCooldown": 10,
-  "BounceForce": 5,
+  "MaxLaserAmmoCount": 3,
+  "LaserReloadCooldown": 10.0,
+  "BounceForce": 5.0,
   "InvulnerabilityDuration": 5000,
   "InvulnerabilityCoolDown": 3000,
-  "MaxHealth": 5
+  "MaxHealth": 3
 }
