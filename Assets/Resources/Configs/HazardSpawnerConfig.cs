@@ -1,7 +1,7 @@
 ﻿using System;
 
 [Serializable]
-public class HazarSpawnerConfig
+public class HazardSpawnerConfig
 {
     public int MinCoolDown;
     public int MaxCoolDown;

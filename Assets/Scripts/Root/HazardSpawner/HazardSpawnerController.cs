@@ -7,31 +7,39 @@ using Random = UnityEngine.Random;
 
 public class HazardSpawnerController : IInitializable, IDisposable
 {
-    private HazarSpawnerConfig _config;
+    private HazardSpawnerConfig _config;
     private SignalBus _signalBus;
-    private HazardSpawnerView _view;
+    private HazardSpawnerReferences _references;
     private Transform _target;
-    
+    private Asteroid.Factory _asteroidFactory;
+    private UFO.Factory _ufoFactory;
+    private Fragment.Factory _fragmentFactory;
     private ObjectPool<UFO> _ufoPool;
     private ObjectPool<Asteroid> _asteroidsPool;
     private FragmentsPool _fragmentsPool;
     private CancellationTokenSource _cts;
-
+    private TargetsRegistry _targetsRegistry;
+    
     [Inject]
-    public void Construct(HazardSpawnerView view, SignalBus signalBus, Player player)
+    public void Construct(HazardSpawnerReferences references, SignalBus signalBus, Player player,
+        HazardSpawnerConfig spawnerConfig, TargetsRegistry targetsRegistry, 
+        UFO.Factory ufoFactory, Asteroid.Factory asteroidFactory, Fragment.Factory fragmentsFactory)
     {
-        _view = view;
+        _references = references;
         _signalBus = signalBus;
         _target = player.transform;
-        _config = JsonConfigLoader.LoadFromResources<HazarSpawnerConfig>("Configs/hazardSpawner_config");
+        _config = spawnerConfig;
+        _targetsRegistry = targetsRegistry;
+        _asteroidFactory = asteroidFactory;
+        _ufoFactory = ufoFactory;
+        _fragmentFactory = fragmentsFactory;
     }
 
     public void Initialize()
     {
-        _ufoPool = new ObjectPool<UFO>(_config.UFOCapacity, _view.UfoPrefab, _view.UfoContainer);
-        _asteroidsPool = new ObjectPool<Asteroid>(_config.AsteroidsCapacity, _view.AsteroidPrefab, _view.AsteroidContainer);
-        _fragmentsPool = new FragmentsPool(_config.FragmentsCapacity, _view.FragmentPrefab, _view.FragmentContainer, _signalBus);
-
+        _ufoPool = new ObjectPool<UFO>(_config.UFOCapacity, _ufoFactory, _references.UfoContainer);
+        _asteroidsPool = new ObjectPool<Asteroid>(_config.AsteroidsCapacity, _asteroidFactory, _references.AsteroidContainer);
+        _fragmentsPool = new FragmentsPool(_config.FragmentsCapacity, _fragmentFactory, _references.FragmentContainer, _signalBus, _targetsRegistry);
         _signalBus.Subscribe<RestartButtonPressedSignal>(ResetSpawner);
         
         _cts = new CancellationTokenSource();
@@ -50,26 +58,29 @@ public class HazardSpawnerController : IInitializable, IDisposable
 
     private void SpawnOne()
     {
-        Transform spawnPoint = _view.GetRandomSpawnPoint();
+        Transform spawnPoint = _references.GetRandomSpawnPoint();
         bool spawnUfo = Random.Range(0, 2) == 0;
 
         if (spawnUfo)
         {
             if (_ufoPool.TryGetObject(out UFO ufo))
             {
-                _view.Place(ufo.transform, spawnPoint);
+                ufo.ResetVelocity();
                 ufo.InitTarget(_target);
-                ufo.OnDestroy += ReturnUFOToPool;
+                ufo.Destroyed += ReturnUFOToPool;
+                _targetsRegistry.Register(ufo);
+                _references.Place(ufo.transform, spawnPoint);
             }
         }
         else
         {
             if (_asteroidsPool.TryGetObject(out Asteroid asteroid))
             {
-                _view.Place(asteroid.transform, spawnPoint);
                 asteroid.SetDirection(spawnPoint.up);
                 asteroid.Init(_fragmentsPool);
                 asteroid.OnDead += ReturnAsteroidToPool;
+                _targetsRegistry.Register(asteroid);
+                _references.Place(asteroid.transform, spawnPoint);
             }
         }
     }
@@ -77,13 +88,15 @@ public class HazardSpawnerController : IInitializable, IDisposable
     private void ReturnAsteroidToPool(Asteroid asteroid)
     {
         asteroid.OnDead -= ReturnAsteroidToPool;
+        _targetsRegistry.Unregister(asteroid);
         _signalBus.Fire(new DestroyableDiedSignal { Entity = asteroid });
         _asteroidsPool.ReturnObject(asteroid);
     }
 
     private void ReturnUFOToPool(UFO ufo)
     {
-        ufo.OnDestroy -= ReturnUFOToPool;
+        ufo.Destroyed -= ReturnUFOToPool;
+        _targetsRegistry.Unregister(ufo);
         _signalBus.Fire(new DestroyableDiedSignal { Entity = ufo });
         _ufoPool.ReturnObject(ufo);
     }

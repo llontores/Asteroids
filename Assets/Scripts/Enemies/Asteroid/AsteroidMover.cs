@@ -23,10 +23,11 @@ public class AsteroidMover
         _direction = direction;
     }
 
-    public void UpdateForces(float deltaTime)
+    public void Update(float deltaTime, Vector3 velocity, Transform transform)
     {
         _physics.AddAcceleration(_direction);
         _velocity = _physics.UpdateForces(deltaTime);
+        transform.position += (Vector3)(velocity * deltaTime);
     }
 
     public void Bounce(Vector2 normal)

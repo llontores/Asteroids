@@ -3,5 +3,6 @@
   "DragForce": 0.15,
   "MaxSpeed": 300.0,
   "BounceForce": 5.0,
-  "Reward": 2
+  "Reward": 2,
+  "MaxDegree": 360
 }

@@ -1,20 +1,17 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Zenject;
 
-public class LaserView : MonoBehaviour
+public class LaserParticlesHandler : MonoBehaviour
 {
     [SerializeField] private ParticleSystem _endPointEffect;
-
-    private LaserShooter _shooter;
+    
     private SignalBus _signalBus;
 
     [Inject]
-    public void Construct(LaserShooter shooter, SignalBus signalBus)
+    public void Construct(SignalBus signalBus)
     {
-        _shooter = shooter;
         _signalBus = signalBus;
-        _signalBus.Subscribe<LaserEndPointUpdatedSignal>(ShowLaserEffect);
-        _signalBus.Subscribe<LaserTurnedOffSignal>(HideLaserEffect);
     }
 
     private void ShowLaserEffect(LaserEndPointUpdatedSignal args)
@@ -28,7 +25,15 @@ public class LaserView : MonoBehaviour
         _endPointEffect.gameObject.SetActive(false);
     }
 
-    private void OnDisable()
+    private void Start()
+    {
+        _signalBus.Subscribe<LaserEndPointUpdatedSignal>(ShowLaserEffect);
+        _signalBus.Subscribe<LaserTurnedOffSignal>(HideLaserEffect);
+        
+        HideLaserEffect();
+    }
+
+    private void OnDestroy()
     {
         _signalBus.Unsubscribe<LaserEndPointUpdatedSignal>(ShowLaserEffect);
         _signalBus.Unsubscribe<LaserTurnedOffSignal>(HideLaserEffect);

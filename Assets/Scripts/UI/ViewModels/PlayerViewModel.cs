@@ -10,6 +10,7 @@ public class PlayerViewModel : IInitializable, IDisposable, ITickable
     private Player _player;
     private Transform _playerTransform;
     private SignalBus _signalBus;
+    private PlayerFacade _playerFacade;
 
     [Data("Score")]
     public readonly ReactiveProperty<string> Score = new("0");
@@ -32,13 +33,16 @@ public class PlayerViewModel : IInitializable, IDisposable, ITickable
     [Data("Speed")]
     public readonly ReactiveProperty<string> Speed = new("0");
     
+    [Data("Health")]
+    public readonly ReactiveProperty<string> Health = new("0");
+    
     [Inject]
-    public void Construct(PlayerMover playerMover, Player player, RewardCounter rewardCounter,
-        LaserShooter laserShooter, SignalBus signalBus)
+    public void Construct(Player player, SignalBus signalBus, PlayerFacade playerFacade)
     {
         _player = player;
         _signalBus = signalBus;
         _playerTransform = _player.transform;
+        _playerFacade = playerFacade;
     }
     
     public void Tick()
@@ -46,13 +50,14 @@ public class PlayerViewModel : IInitializable, IDisposable, ITickable
         XAxis.Value =  "X: " + Math.Round(_playerTransform.position.x, RoundValue);
         YAxis.Value = "Y: " + Math.Round(_playerTransform.position.y, RoundValue);
         ZRotation.Value = "Z: " + Math.Round(_playerTransform.eulerAngles.z, RoundValue);
+        Health.Value = $"HP: {_playerFacade.CurrentHealth}/{_playerFacade.MaxHealth}";
     }
 
     public void Initialize()
     {
         _signalBus.Subscribe<PlayerSpeedChangedSignal>(UpdateSpeed);
         _signalBus.Subscribe<ScoreChangedSignal>(UpdateScore);
-        _signalBus.Subscribe<LaserReloadRemainingTimeChangedSIgnal>(UpdateReloadRemainTime);
+        _signalBus.Subscribe<LaserReloadRemainingTimeChangedSignal>(UpdateReloadRemainTime);
         _signalBus.Subscribe<LaserRemainingAmmoCountUpdatedSignal>(UpdateRemainAmmo);
     }
 
@@ -60,7 +65,7 @@ public class PlayerViewModel : IInitializable, IDisposable, ITickable
     {
         _signalBus.Unsubscribe<PlayerSpeedChangedSignal>(UpdateSpeed);
         _signalBus.Unsubscribe<ScoreChangedSignal>(UpdateScore);
-        _signalBus.Unsubscribe<LaserReloadRemainingTimeChangedSIgnal>(UpdateReloadRemainTime);
+        _signalBus.Unsubscribe<LaserReloadRemainingTimeChangedSignal>(UpdateReloadRemainTime);
         _signalBus.Unsubscribe<LaserRemainingAmmoCountUpdatedSignal>(UpdateRemainAmmo);
         
         Score.Dispose();
@@ -77,7 +82,7 @@ public class PlayerViewModel : IInitializable, IDisposable, ITickable
         LaserAmmo.Value = "Laser Ammo: " + args.AmmoCount;
     }
 
-    private void UpdateReloadRemainTime(LaserReloadRemainingTimeChangedSIgnal args)
+    private void UpdateReloadRemainTime(LaserReloadRemainingTimeChangedSignal args)
     {
         LaserCooldown.Value = "Laser Cooldown: " + Math.Round(args.RemainingTime, RoundValue);
     }

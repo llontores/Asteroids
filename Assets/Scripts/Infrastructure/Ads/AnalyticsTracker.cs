@@ -3,12 +3,12 @@ using Firebase.Analytics;
 using Zenject;
 using System;
 
-public class AnalyticsManager : IInitializable
+public class AnalyticsTracker : IInitializable, IDisposable
 {
     private readonly SignalBus _signalBus;
     private bool _isInitialized = false;
 
-    public AnalyticsManager(SignalBus signalBus)
+    public AnalyticsTracker(SignalBus signalBus)
     {
         _signalBus = signalBus;
     }
@@ -32,16 +32,28 @@ public class AnalyticsManager : IInitializable
             }
         });
     }
+    
+
+    public void Dispose()
+    {
+        _signalBus.Unsubscribe<PlayerDeadSignal>(OnPlayerDead);
+        _signalBus.Unsubscribe<RestartButtonPressedSignal>(OnRestartClicked);
+    }
 
     private void SubscribeToEvents()
     {
-        _signalBus.Subscribe<PlayerDeadSignal>(() => {
-            LogEvent("player_death");
-        });
+        _signalBus.Subscribe<PlayerDeadSignal>(OnPlayerDead);
+        _signalBus.Subscribe<RestartButtonPressedSignal>(OnRestartClicked);
+    }
+    
+    private void OnPlayerDead()
+    {
+        LogEvent("player_death");
+    }
 
-        _signalBus.Subscribe<RestartButtonPressedSignal>(() => {
-            LogEvent("restart_clicked");
-        });
+    private void OnRestartClicked()
+    {
+        LogEvent("restart_clicked");
     }
 
     private void LogEvent(string eventName)
@@ -49,4 +61,5 @@ public class AnalyticsManager : IInitializable
         if (!_isInitialized) return;
         FirebaseAnalytics.LogEvent(eventName);
     }
+
 }

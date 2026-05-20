@@ -1,16 +1,16 @@
 using UnityEngine;
 
-public class UFOView
+public class UFORotator
 {
     private readonly Transform _transform;
     private readonly float _spinningSpeed;
     private readonly int _spinningTurn;
 
-    public UFOView(Transform transform, UFOConfig config)
+    public UFORotator(Transform transform, float spinningMinSpeed, float spinningMaxSpeed)
     {
         _transform = transform;
-        _spinningSpeed = Random.Range(config.SpinningMinSpeed, config.SpinningMaxSpeed + 1);
-        _spinningTurn = Random.Range(-1, 2); // LeftTurnIndex / RightTurnIndex
+        _spinningSpeed = Random.Range(spinningMinSpeed, spinningMaxSpeed + 1);
+        _spinningTurn = Random.Range(-1, 2);
     }
 
     public void Rotate(float deltaTime)

@@ -8,6 +8,7 @@ public class ClickButton : Button
 
     public override void OnPointerDown(PointerEventData eventData)
     {
+        base.OnPointerDown(eventData);
         ButtonPressed?.Invoke();
     }
 }

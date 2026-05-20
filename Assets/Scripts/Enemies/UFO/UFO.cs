@@ -2,42 +2,53 @@
 using UnityEngine.Events;
 using Zenject;
 
-public class UFO : Entity, IDestroyable
+public class UFO : Entity, ITarget
 {
-    public event UnityAction<UFO> OnDestroy;
-    private UFOModel _model;
+    public event UnityAction<UFO> Destroyed;
+    public float ColliderRadius { get; private set; }
+    public Vector2 Position => transform.position;
+
+    private SpriteRenderer _renderer;
+    private UFOFacade _facade;
 
     [Inject]
-    public void Construct(UFOModel model)
+    public void Construct(UFOFacade facade)
     {
-        _model = model;
-        _model.InitTransform(transform);
-        _reward = _model.Reward;
+        _facade = facade;
+        _facade.InitTransform(transform);
+        _reward = _facade.Reward;
+        _renderer = GetComponent<SpriteRenderer>();
+        ColliderRadius = Mathf.Max(_renderer.bounds.extents.x, _renderer.bounds.extents.y);
     }
 
     private void Update()
     {
-        _model?.Update(Time.deltaTime);
-    }
-
-    public void InitTarget(Transform target)
-    {
-        _model.SetTarget(target);
+        _facade?.Update(Time.deltaTime);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.TryGetComponent(out Player player) || other.TryGetComponent(out InvulnerableCircle invulnerableCircle))
         {
-            Vector2 contactPoint = other.ClosestPoint(transform.position);
-            Vector2 normal = ((Vector2)transform.position - contactPoint).normalized;
-            _model.Bounce(normal);
+            _facade.Bounce(other);
         }
+    }
+
+    public void ResetVelocity()
+    {
+        _facade.ResetVelocity();
+    }
+    
+    public void InitTarget(Transform target)
+    {
+        _facade.SetTarget(target);
     }
 
     public void Destroy(DestroyReason reason)
     {
         SetDestroyReason(reason);
-        OnDestroy?.Invoke(this);
+        Destroyed?.Invoke(this);
     }
+    
+    public class Factory : PlaceholderFactory<UFO> { }
 }

@@ -12,24 +12,39 @@ public class BulletsShooter : IInitializable, IDisposable
     private float _laserShootCooldown;
     private Bullet _bulletPrefab;
     private bool _canShootBullets = true;
-    private Player _player;
     private CancellationTokenSource _cancellationToken;
-    public ObjectPool<Bullet> BulletPool {get; private set; }
-
-    [Inject]
-    public void Construct(Player player, SignalBus signalBus, BulletsContainer bulletsContainer)
-    {
-        _player = player;
-        _signalBus = signalBus;
-        _bulletPrefab = _player.BulletPrefab;
-        BulletPool = new ObjectPool<Bullet>(10, _bulletPrefab, bulletsContainer.transform);
-    }
+    private BulletsShooterConfig _shooterConfig;
+    private int _poolCapacity;
+    private PlayerConfig _playerConfig;
+    private PlayerReferences _playerReferences;
+    private PlayerFacade _playerFacade;
+    private BulletsContainer _bulletsContainer;
+    private Bullet.Factory _bulletFactory;
     
+    public ObjectPool<Bullet> BulletPool { get; private set; }
+    
+    [Inject]
+    public void Construct(PlayerFacade playerFacade, SignalBus signalBus, BulletsContainer bulletsContainer, 
+        BulletsShooterConfig shooterConfig, PlayerConfig playerConfig, PlayerReferences playerReferences, Bullet.Factory bulletFactory)
+    {
+        _playerConfig =  playerConfig;
+        _shooterConfig = shooterConfig; 
+        _playerFacade = playerFacade;
+        _signalBus = signalBus;
+        _playerReferences = playerReferences;
+        _bulletsContainer = bulletsContainer;
+        _bulletPrefab = playerReferences.BulletPrefab;
+        _bulletFactory = bulletFactory;
+    }
+
     public void Initialize()
     {
+        _poolCapacity = _shooterConfig.PoolCapacity;
+        BulletPool = new ObjectPool<Bullet>(_poolCapacity, _bulletFactory, _bulletsContainer.transform);
+        _bulletPrefab = _playerReferences.BulletPrefab;
         _signalBus.Subscribe<BulletShootSignal>(FireBullets);
-        _shootPoint = _player.ShootPoint;
-        _bulletShootCooldown = _player.Config.BulletsShootCooldown;
+        _shootPoint = _playerReferences.ShootPoint;
+        _bulletShootCooldown = _playerConfig.BulletsShootCooldown;
         _cancellationToken = new CancellationTokenSource();
     }
 
@@ -42,7 +57,7 @@ public class BulletsShooter : IInitializable, IDisposable
 
     private void FireBullets()
     {
-        if (_canShootBullets == false || _player.IsInvulnerable)
+        if (_canShootBullets == false || _playerFacade.IsInvulnerable)
             return;
 
         if (BulletPool.TryGetObject(out Bullet bullet))
@@ -51,18 +66,18 @@ public class BulletsShooter : IInitializable, IDisposable
             bullet.transform.rotation = _shootPoint.rotation;
             bullet.gameObject.SetActive(true);
             bullet.OnBulletDestroyed += ReturnBulletToPool;
+            _canShootBullets = false;
         }
-        
-        _canShootBullets =  false;
+
         BulletsCooldown().Forget();
     }
 
-    private async UniTaskVoid BulletsCooldown()
+    private async UniTask BulletsCooldown()
     {
         await UniTask.Delay(_bulletShootCooldown, cancellationToken: _cancellationToken.Token);
         _canShootBullets = true;
     }
-    
+
     private void ReturnBulletToPool(Bullet bullet)
     {
         bullet.OnBulletDestroyed -= ReturnBulletToPool;

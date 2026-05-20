@@ -1,7 +1,4 @@
 using System;
-
-using UnityEngine;
-using UnityEngine.Events;
 using Zenject;
 
 public class RewardCounter : IDisposable, IInitializable
@@ -14,8 +11,6 @@ public class RewardCounter : IDisposable, IInitializable
     public void Construct(SignalBus signalBus)
     {
         _signalBus = signalBus;
-        _signalBus.Subscribe<DestroyableDiedSignal>(TryAddScore);
-        _signalBus.Subscribe<RestartButtonPressedSignal>(ResetScore);
     }
     
     public void TryAddScore(DestroyableDiedSignal args)
@@ -35,6 +30,8 @@ public class RewardCounter : IDisposable, IInitializable
 
     public void Initialize()
     {
+        _signalBus.Subscribe<DestroyableDiedSignal>(TryAddScore);
+        _signalBus.Subscribe<RestartButtonPressedSignal>(ResetScore);
         _score = 0;
         _signalBus.Fire(new ScoreChangedSignal{Score = _score});
     }

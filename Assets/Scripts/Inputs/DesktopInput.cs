@@ -4,12 +4,6 @@ using UnityEngine;
 
 public class DesktopInput : InputHandler, ITickable
 {
-    [Inject]
-    public void Construct(MobileButtonsHandler buttonsHandler)
-    {
-        buttonsHandler.gameObject.SetActive(false);
-    }
-    
     public void Tick()
     {
         if (Input.GetKeyUp(KeyCode.W))

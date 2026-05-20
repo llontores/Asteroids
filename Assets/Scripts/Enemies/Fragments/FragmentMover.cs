@@ -3,28 +3,31 @@ using UnityEngine;
 public class FragmentMover
 {
     private readonly Physics _physics;
-    private readonly Transform _transform;
     private Vector2 _velocity;
 
-    public FragmentMover(Transform transform, FragmentConfig config)
+    public FragmentMover(float impulseForce, float dragForce, float maxSpeed, float bounceForce)
     {
-        _transform = transform;
-        _physics = new Physics(config.ImpulseForce, config.DragForce, config.MaxSpeed, config.BounceForce);
+        _physics = new Physics(impulseForce, dragForce, maxSpeed, bounceForce);
     }
 
-    public void OnEnable()
+    public void OnFragmentEnable(Vector3 direction)
     {
-        _physics.AddAcceleration(_transform.up);
+        _physics.AddAcceleration(direction);
     }
 
-    public void Update(float deltaTime)
+    public void Update(float deltaTime, Transform transform)
     {
         _velocity = _physics.UpdateForces(deltaTime);
-        _transform.position += (Vector3)(_velocity * deltaTime);
+        transform.position += (Vector3)(_velocity * deltaTime);
     }
 
     public void Bounce(Vector2 normal)
     {
         _physics.Bounce(normal);
+    }
+
+    public void ResetVelocity()
+    {
+        _physics.ResetVelocity();
     }
 }

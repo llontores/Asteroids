@@ -83,19 +83,20 @@ public sealed class MonoViewBinder : MonoBehaviour
     }
 #endif
 
-    private void Awake()
+    private void Start()
     {
         _binder = CreateBinder();
+        _binder.Bind();
     }
 
     private void OnEnable()
     {
-        _binder.Bind();
+        _binder?.Bind();
     }
 
     private void OnDisable()
     {
-        _binder.Unbind();
+        _binder?.Unbind();
     }
 
     private IBinder CreateBinder()

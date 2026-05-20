@@ -17,19 +17,16 @@ public class ExplosionParticlesPool : MonoBehaviour
     private ExplosionParticlesPoolConfig _config;
 
     [Inject]
-    public void Construct(SignalBus signalBus)
+    public void Construct(SignalBus signalBus, ExplosionParticlesPoolConfig config)
     {
         _signalBus = signalBus;
-        _config = JsonConfigLoader.LoadFromResources<ExplosionParticlesPoolConfig>("Configs/explosionParticlesPool_config");
+        _config = config;
         
         _particlesContainerCapacity = _config.Capacity;
         _particlesPool = new ObjectPool<ParticleSystem>(_particlesContainerCapacity, _explosionParticles, _particlesSystemContainer);
         _effectDuration = _explosionParticles.main.duration;
 
         _sessionCts = new CancellationTokenSource();
-
-        _signalBus.Subscribe<DestroyableDiedSignal>(SetParticles);
-        _signalBus.Subscribe<RestartButtonPressedSignal>(ResetPoolForNewGame);
     }
 
     private void ResetPoolForNewGame()
@@ -50,14 +47,17 @@ public class ExplosionParticlesPool : MonoBehaviour
         }
     }
 
-    private void OnDisable()
+    private void Start()
     {
-        _signalBus.Unsubscribe<DestroyableDiedSignal>(SetParticles);
-        _signalBus.Unsubscribe<RestartButtonPressedSignal>(ResetPoolForNewGame);
+        _signalBus.Subscribe<DestroyableDiedSignal>(SetParticles);
+        _signalBus.Subscribe<RestartButtonPressedSignal>(ResetPoolForNewGame);
     }
 
     private void OnDestroy()
     {
+        _signalBus.Unsubscribe<DestroyableDiedSignal>(SetParticles);
+        _signalBus.Unsubscribe<RestartButtonPressedSignal>(ResetPoolForNewGame);
+        
         if (_sessionCts != null)
         {
             _sessionCts.Cancel();

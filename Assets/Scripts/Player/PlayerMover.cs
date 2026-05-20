@@ -1,7 +1,6 @@
 ﻿using System;
 using Zenject;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class PlayerMover : IInitializable, IDisposable, ITickable
 {
@@ -11,10 +10,14 @@ public class PlayerMover : IInitializable, IDisposable, ITickable
     private Physics _physics;
     private Player _player;
     private Vector3 _startPosition;
+    private PlayerConfig _config;
+    private PlayerFacade _playerFacade;
 
     [Inject]
-    public void Construct(SignalBus signalBus, Player player)
+    public void Construct(SignalBus signalBus, Player player, PlayerConfig config, PlayerFacade playerFacade)
     {
+        _playerFacade = playerFacade;
+        _config =  config;
         _player = player;
         _signalBus = signalBus;
     }
@@ -24,9 +27,9 @@ public class PlayerMover : IInitializable, IDisposable, ITickable
         _signalBus.Subscribe<AccelerationSignal>(Accelerate);
         _signalBus.Subscribe<TurnSignal>(Turn);
         _player.OnTriggerEntered += Bounce;
-        _turnSpeed = _player.Config.TurnSpeed;
+        _turnSpeed = _config.TurnSpeed;
         _playerTransform = _player.transform;
-        _physics = new Physics(_player.Config.Thrust, _player.Config.DragForce, _player.Config.MaxSpeed, _player.Config.BounceForce);
+        _physics = new Physics(_config.Thrust, _config.DragForce, _config.MaxSpeed, _config.BounceForce);
         _physics.OnCurrentSpeedChanged += UpdateSpeedData;
         _startPosition = _player.transform.position;
         _signalBus.Subscribe<RestartButtonPressedSignal>(ResetPosition);
@@ -49,7 +52,7 @@ public class PlayerMover : IInitializable, IDisposable, ITickable
 
     private void Accelerate(AccelerationSignal args)
     {
-        if(_player.IsInvulnerable)
+        if(_playerFacade.IsInvulnerable)
             return;
         
         _physics.AddAcceleration(_playerTransform.up * args.Power);
@@ -57,7 +60,7 @@ public class PlayerMover : IInitializable, IDisposable, ITickable
 
     private void Turn(TurnSignal args)
     {
-        if(_player.IsInvulnerable == true)
+        if(_playerFacade.IsInvulnerable == true)
             return;
      
         int turnIndex = args.TurnIndex;
@@ -66,6 +69,9 @@ public class PlayerMover : IInitializable, IDisposable, ITickable
 
     private void Bounce(Collider2D other)
     {
+        if(_playerFacade.IsInvulnerable == true || other.TryGetComponent<Bullet>(out Bullet _))
+            return;
+        
         Vector2 contactPoint = other.ClosestPoint(_player.transform.position);
         Vector2 normal = ((Vector2)_player.transform.position - contactPoint).normalized;
 

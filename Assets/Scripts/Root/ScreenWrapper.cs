@@ -11,12 +11,12 @@ public class ScreenWrapper : ITickable
     private Transform _transform;
 
     [Inject]
-    public void Construct(IWrappable player)
+    public void Construct(Player player, Camera mainCamera, PlayerReferences playerReferences)
     {
         _transform = player.Transform;
-        _mainCamera = Camera.main;
+        _mainCamera = mainCamera;
         _screenBounds = _mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, _mainCamera.transform.position.z));
-        _renderer = player.Renderer;
+        _renderer = playerReferences.Renderer;
         _objectWidth = _renderer.bounds.extents.x;
         _objectHeight = _renderer.bounds.extents.y;
     }

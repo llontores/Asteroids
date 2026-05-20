@@ -2,38 +2,40 @@
 using UnityEngine.Events;
 using Zenject;
 
-public class Fragment : Entity, IDestroyable
+public class Fragment : Entity, ITarget
 {
+    public Vector2 Position => transform.position;
+    public float ColliderRadius { get; private set; }
     public event UnityAction<Fragment> OnDestroy;
     
-    private FragmentModel _model;
+    private FragmentFacade _facade;
+    private SpriteRenderer _renderer;
 
     [Inject]
-    public void Construct(FragmentModel model)
+    public void Construct(FragmentFacade facade)
     {
-        _model = model;
-        _model.InitTransform(transform);
-        _reward = _model.Reward;
+        _facade = facade;
+        _facade.Init(transform);
+        _reward = _facade.Reward;
+        _renderer = GetComponent<SpriteRenderer>();
+        ColliderRadius = Mathf.Max(_renderer.bounds.extents.x, _renderer.bounds.extents.y);
     }
 
     private void OnEnable()
     {
-        _model?.OnEnable();
+        _facade?.OnFragmentEnable();
     }
 
     private void Update()
     {
-        _model?.Update(Time.deltaTime);
+        _facade?.Update(Time.deltaTime);
     }
     
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.TryGetComponent(out Player player) || other.TryGetComponent(out InvulnerableCircle invulnerableCircle))
         {
-            Vector2 contactPoint = other.ClosestPoint(transform.position);
-            Vector2 normal = ((Vector2)transform.position - contactPoint).normalized;
-
-            _model.Bounce(normal);
+            _facade.Bounce(other);
         }
     }
 
@@ -42,4 +44,11 @@ public class Fragment : Entity, IDestroyable
         SetDestroyReason(reason);
         OnDestroy?.Invoke(this);
     }
+
+    public void ResetVelocity()
+    {
+        _facade.ResetVelocity();
+    }
+
+    public class Factory : PlaceholderFactory<Fragment> { }
 }

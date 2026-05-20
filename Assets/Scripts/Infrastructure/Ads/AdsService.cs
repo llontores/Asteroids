@@ -4,20 +4,18 @@ using Zenject;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 
-public class AdManager : IInitializable, IDisposable
+public class AdsService : IInitializable, IDisposable
 {
     private readonly SignalBus _signalBus;
     private InterstitialAd _interstitialAd;
     private const string AdUnitId = "ca-app-pub-3940256099942544/1033173712";
 
-    public AdManager(SignalBus signalBus) => _signalBus = signalBus;
+    public AdsService(SignalBus signalBus) => _signalBus = signalBus;
 
     public void Initialize()
     {
-        Debug.unityLogger.logEnabled = false;
         MobileAds.RaiseAdEventsOnUnityMainThread = true; 
         MobileAds.Initialize(_ => LoadInterstitial());
-
 
         _signalBus.Subscribe<RestartButtonPressedSignal>(OnRestartRequested);
     }

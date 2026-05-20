@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class HazardSpawnerView : MonoBehaviour
+public class HazardSpawnerReferences : MonoBehaviour
 {
     [SerializeField] private Transform[] _spawnPoints;
     

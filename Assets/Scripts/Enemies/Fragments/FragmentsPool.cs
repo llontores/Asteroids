@@ -4,10 +4,13 @@ using Zenject;
 public class FragmentsPool : ObjectPool<Fragment>
 {
     private SignalBus _signalBus;
+    private TargetsRegistry _targetsRegistry;
     
-    public FragmentsPool(int capacity, Fragment prefab, Transform container, SignalBus signalBus) : base(capacity, prefab, container)
+    public FragmentsPool(int capacity, IFactory<Fragment> prefab, Transform container, 
+        SignalBus signalBus, TargetsRegistry targetsRegistry) : base(capacity, prefab, container)
     {
         _signalBus = signalBus;
+        _targetsRegistry = targetsRegistry;   
     }
 
     public Fragment GetFragment()
@@ -15,6 +18,7 @@ public class FragmentsPool : ObjectPool<Fragment>
         if (TryGetObject(out Fragment fragment))
         {
             fragment.OnDestroy += ReturnFragmentToPool;
+            _targetsRegistry.Register(fragment);
             return fragment;
         }
 
@@ -24,6 +28,7 @@ public class FragmentsPool : ObjectPool<Fragment>
     private void ReturnFragmentToPool(Fragment fragment)
     {
         fragment.OnDestroy -= ReturnFragmentToPool;
+        _targetsRegistry.Unregister(fragment);
         _signalBus.Fire(new DestroyableDiedSignal{Entity = fragment});
         ReturnObject(fragment);
     }
