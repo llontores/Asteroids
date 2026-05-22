@@ -32,7 +32,7 @@ public class PlayerFacade : IInitializable, IDisposable
 
     public void Initialize()
     {
-        _player.OnTriggerEntered += NandleCollision;
+        _player.OnTriggerEntered += HandleCollision;
         _invulnerableCircle = _playerReferences.InvulnerableEffectCircle;
         _invulnerableCircle.gameObject.SetActive(false);
         _invulnerabilityCollider = _playerReferences.PolygonCollider2D;
@@ -45,13 +45,13 @@ public class PlayerFacade : IInitializable, IDisposable
 
     public void Dispose()
     {
-        _player.OnTriggerEntered -= NandleCollision;
+        _player.OnTriggerEntered -= HandleCollision;
         _signalBus.Unsubscribe<RestartButtonPressedSignal>(Reset);
         
         CancelToken();
     }
 
-    private void NandleCollision(Collider2D collision)
+    private void HandleCollision(Collider2D collision)
     {
         if (IsInvulnerable)
             return;
@@ -72,10 +72,13 @@ public class PlayerFacade : IInitializable, IDisposable
         _currentHealth = Mathf.Clamp(_currentHealth - 1, 0, _config.MaxHealth);
 
         if (_currentHealth <= 0)
+        {
             _signalBus.Fire(new PlayerDeadSignal());
+            CancelToken();
+        }
     }
 
-    private async UniTaskVoid TurnOffCollider()
+    private async UniTask TurnOffCollider()
     {
         CancelToken();
         _cancellationTokenSource = new CancellationTokenSource();

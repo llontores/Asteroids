@@ -34,7 +34,7 @@ public class PlayerViewModel : IInitializable, IDisposable, ITickable
     public readonly ReactiveProperty<string> Speed = new("0");
     
     [Data("Health")]
-    public readonly ReactiveProperty<string> Health = new("0");
+    public readonly ReactiveProperty<HealthData> Health = new(new HealthData());
     
     [Inject]
     public void Construct(Player player, SignalBus signalBus, PlayerFacade playerFacade)
@@ -50,7 +50,11 @@ public class PlayerViewModel : IInitializable, IDisposable, ITickable
         XAxis.Value =  "X: " + Math.Round(_playerTransform.position.x, RoundValue);
         YAxis.Value = "Y: " + Math.Round(_playerTransform.position.y, RoundValue);
         ZRotation.Value = "Z: " + Math.Round(_playerTransform.eulerAngles.z, RoundValue);
-        Health.Value = $"HP: {_playerFacade.CurrentHealth}/{_playerFacade.MaxHealth}";
+        Health.Value = new HealthData 
+        { 
+            Current = _playerFacade.CurrentHealth, 
+            Max = _playerFacade.MaxHealth 
+        };
     }
 
     public void Initialize()
@@ -75,6 +79,7 @@ public class PlayerViewModel : IInitializable, IDisposable, ITickable
         YAxis.Dispose();
         ZRotation.Dispose();
         Speed.Dispose();
+        Health.Dispose();
     }
 
     private void UpdateRemainAmmo(LaserRemainingAmmoCountUpdatedSignal args)

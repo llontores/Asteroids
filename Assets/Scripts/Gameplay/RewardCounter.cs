@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 using Zenject;
 
 public class RewardCounter : IDisposable, IInitializable
@@ -22,7 +23,7 @@ public class RewardCounter : IDisposable, IInitializable
         _signalBus.Fire(new ScoreChangedSignal{Score = _score});
     }
 
-    public void Dispose()
+    public void Dispose()   
     {
         _signalBus.Unsubscribe<DestroyableDiedSignal>(TryAddScore);
         _signalBus.Unsubscribe<RestartButtonPressedSignal>(ResetScore);

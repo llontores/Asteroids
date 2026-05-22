@@ -1,5 +1,6 @@
 ﻿public enum DestroyReason
 {
     World,
-    Shootable
+    Shootable,
+    Laser
 }

@@ -16,7 +16,7 @@ public class AsteroidRotator
         _spinningTurn = Random.Range(RightTurnIndex, LeftTurnIndex + 1);
     }
 
-    public void Speen(float deltaTime)
+    public void Spin(float deltaTime)
     {
         _transform.Rotate(0, 0, _spinningTurn * deltaTime * _spinningSpeed);
     }

@@ -15,25 +15,10 @@ public class GameplayInstaller : MonoInstaller
     [SerializeField] private Camera _mainCamera;
     [SerializeField] private PlayerReferences _playerReferences;
     
-    private PlayerConfig _playerConfig;
-    private BulletConfig _bulletConfig;
-    private AsteroidConfig _asteroidConfig;
-    private FragmentConfig _fragmentConfig;
-    private UFOConfig _ufoConfig;
-    private HazardSpawnerConfig _hazardSpawnerConfig;
-    private BulletsShooterConfig _bulletsShooterConfig;
-    private ExplosionParticlesPoolConfig _explosionParticlesPoolConfig;
-    
     public override void InstallBindings()
     {
-        _playerConfig = JsonConfigLoader.LoadFromResources<PlayerConfig>("Configs/player_config");
-        _bulletConfig = JsonConfigLoader.LoadFromResources<BulletConfig>("Configs/bullet_config");
-        _asteroidConfig = JsonConfigLoader.LoadFromResources<AsteroidConfig>("Configs/asteroid_config");
-        _fragmentConfig = JsonConfigLoader.LoadFromResources<FragmentConfig>("Configs/fragment_config");
-        _ufoConfig =  JsonConfigLoader.LoadFromResources<UFOConfig>("Configs/ufo_config");
-        _hazardSpawnerConfig = JsonConfigLoader.LoadFromResources<HazardSpawnerConfig>("Configs/hazardSpawner_config");
-        _bulletsShooterConfig = JsonConfigLoader.LoadFromResources<BulletsShooterConfig>("Configs/bulletsShooter_config");
-        _explosionParticlesPoolConfig = JsonConfigLoader.LoadFromResources<ExplosionParticlesPoolConfig>("Configs/explosionParticlesPool_config");
+        ConfigProvider configProvider = new ConfigProvider();
+        configProvider.LoadAll();
         
         SignalBusInstaller.Install(Container);
         
@@ -50,20 +35,21 @@ public class GameplayInstaller : MonoInstaller
         Container.DeclareSignal<LaserTurnedOffSignal>();
         Container.DeclareSignal<PlayerDeadSignal>();
         Container.DeclareSignal<RestartButtonPressedSignal>();
-
-        Container.Bind<PlayerConfig>().FromInstance(_playerConfig).AsSingle();
-        Container.Bind<BulletConfig>().FromInstance(_bulletConfig).AsSingle();
-        Container.Bind<AsteroidConfig>().FromInstance(_asteroidConfig).AsSingle();
-        Container.Bind<FragmentConfig>().FromInstance(_fragmentConfig).AsSingle();
-        Container.Bind<UFOConfig>().FromInstance(_ufoConfig).AsSingle();
-        Container.Bind<BulletsShooterConfig>().FromInstance(_bulletsShooterConfig).AsSingle();
-        Container.Bind<HazardSpawnerConfig>().FromInstance(_hazardSpawnerConfig).AsSingle();
-        Container.Bind<ExplosionParticlesPoolConfig>().FromInstance(_explosionParticlesPoolConfig).AsSingle();
+        
+        Container.Bind<PlayerConfig>().FromInstance(configProvider.Player).AsSingle();
+        Container.Bind<BulletConfig>().FromInstance(configProvider.Bullet).AsSingle();
+        Container.Bind<AsteroidConfig>().FromInstance(configProvider.Asteroid).AsSingle();
+        Container.Bind<FragmentConfig>().FromInstance(configProvider.Fragment).AsSingle();
+        Container.Bind<UFOConfig>().FromInstance(configProvider.UFO).AsSingle();
+        Container.Bind<BulletsShooterConfig>().FromInstance(configProvider.BulletsShooter).AsSingle();
+        Container.Bind<HazardSpawnerConfig>().FromInstance(configProvider.HazardSpawner).AsSingle();
+        Container.Bind<ExplosionParticlesPoolConfig>().FromInstance(configProvider.ExplosionParticlesPool).AsSingle();
         
         Container.BindInterfacesAndSelfTo<Player>().FromInstance(_player).AsSingle().NonLazy(); 
         Container.Bind<MobileButtonsHandler>().FromInstance(_mobileButtonsHandler).AsSingle();
         Container.BindInterfacesAndSelfTo<RewardCounter>().AsSingle().NonLazy();
         Container.Bind<HazardSpawnerReferences>().FromInstance(_hazardSpawnerReferences).AsSingle();
+        
         Container.BindFactory<Asteroid, Asteroid.Factory>()
             .FromComponentInNewPrefab(_hazardSpawnerReferences.AsteroidPrefab);
         Container.BindFactory<UFO, UFO.Factory>()
@@ -72,6 +58,7 @@ public class GameplayInstaller : MonoInstaller
             .FromComponentInNewPrefab(_hazardSpawnerReferences.FragmentPrefab);
         Container.BindFactory<Bullet, Bullet.Factory>()
             .FromComponentInNewPrefab(_playerReferences.BulletPrefab);
+            
         Container.BindInterfacesAndSelfTo<PlayerMover>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<PlayerEffectsController>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<ScreenWrapper>().AsSingle().NonLazy();
@@ -87,17 +74,22 @@ public class GameplayInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<LaserShooter>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<AdsService>().AsSingle().NonLazy();
         Container.BindInterfacesAndSelfTo<AnalyticsTracker>().AsSingle().NonLazy();
+        
         Container.Bind<AsteroidFacade>().AsTransient();
         Container.Bind<FragmentFacade>().AsTransient();
         Container.Bind<UFOFacade>().AsTransient();
         Container.Bind<BulletFacade>().AsTransient();
+        
+        Container.Bind<FragmentsPool>().AsSingle().WithArguments(configProvider.HazardSpawner.FragmentsCapacity, _hazardSpawnerReferences.FragmentContainer);
         Container.BindInterfacesAndSelfTo<HazardSpawnerController>().AsSingle().NonLazy();
+        
         Container.Bind<Camera>().FromInstance(_mainCamera).AsSingle();
         Container.Bind<PlayerReferences>().FromInstance(_playerReferences).AsSingle();
         Container.Bind<TargetsRegistry>().AsSingle();
         Container.Bind<CustomRaycaster>().AsSingle();
 
         BinderFactory.RegisterBinder<TextBinder>();
+        BinderFactory.RegisterBinder<HeartsBinder>();
 
         Container.BindInitializableExecutionOrder<PlayerViewModel>(-100);
         Container.BindInitializableExecutionOrder<LaserShooter>(0);
@@ -110,6 +102,5 @@ public class GameplayInstaller : MonoInstaller
             Container.BindInterfacesAndSelfTo<DesktopInput>().AsSingle();
             _mobileButtonsHandler.gameObject.SetActive((false));
         }
-        
     }
 }

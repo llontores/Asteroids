@@ -5,5 +5,6 @@
   "SpinningMinSpeed": 50,
   "SpinningMaxSpeed": 100,
   "BounceForce": 15,
-  "Reward": 6
+  "Reward": 6,
+  "Radius": 0.5415
 }

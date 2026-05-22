@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.IO;
+using UnityEngine;
 using Newtonsoft.Json; 
 
 public static class JsonConfigLoader
@@ -9,12 +11,16 @@ public static class JsonConfigLoader
         
         if (asset == null)
         {
-            Debug.LogError($"Config not found at path: {path}");
-            return null;
+            throw new FileNotFoundException($"Не удалось загрузить конфиг из Resources! Путь: {path}");
         }
 
         T config = JsonConvert.DeserializeObject<T>(asset.text);
-        
+
+        if (config == null)
+        {
+            throw new InvalidOperationException($"JSON конфиг по пути {path} пуст или имеет неверный формат!");
+        }
+
         return config;
     }
 }

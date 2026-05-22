@@ -7,7 +7,6 @@ public class PlayerReferences : MonoBehaviour
     [SerializeField] private Transform _shootPoint;
     [SerializeField] private Bullet _bulletPrefab;
     [SerializeField] private LineRenderer _lineRenderer;
-    [SerializeField] private LayerMask _layerMaskIgnore;
     [SerializeField] private PolygonCollider2D _polygonCollider2D;
     [SerializeField] private ParticleSystem _bulletShootParticles;
     [SerializeField] private InvulnerableCircle _invulnerableEffectCircle;
@@ -17,7 +16,6 @@ public class PlayerReferences : MonoBehaviour
     public Transform ShootPoint => _shootPoint;
     public Bullet BulletPrefab => _bulletPrefab;
     public LineRenderer LineRenderer => _lineRenderer;
-    public LayerMask LayerMaskIgnore => _layerMaskIgnore;
     public PolygonCollider2D PolygonCollider2D => _polygonCollider2D;
     public ParticleSystem BulletShootParticles => _bulletShootParticles;
     public InvulnerableCircle InvulnerableEffectCircle => _invulnerableEffectCircle;

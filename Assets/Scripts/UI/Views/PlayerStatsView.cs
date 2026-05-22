@@ -11,5 +11,5 @@ public class PlayerStatsView : MonoBehaviour
     [Data("YAxis")] public TMP_Text YAxis;
     [Data("ZRotation")] public TMP_Text ZRotation;
     [Data("Speed")] public TMP_Text SpeedText;
-    [Data("Health")] public TMP_Text HealthText;
+    [Data("Health")] public HeartsView HealthHearts;
 }

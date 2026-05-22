@@ -10,14 +10,14 @@ public abstract class InputHandler
         _signalBus = signalBus;
     }
 
-    protected void FireAcceleration(float Power)
+    protected void FireAcceleration(float power)
     {
-        _signalBus.Fire(new AccelerationSignal { Power = Power });
+        _signalBus.Fire(new AccelerationSignal { Power = power });
     }
 
-    protected void FireRotation(int TurnIndex)
+    protected void FireRotation(int turnIndex)
     {
-        _signalBus.Fire(new TurnSignal{TurnIndex = TurnIndex});
+        _signalBus.Fire(new TurnSignal{TurnIndex = turnIndex});
     }
 
     protected void FireBulletShot()  

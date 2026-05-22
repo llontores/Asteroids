@@ -10,4 +10,5 @@ public class UFOConfig
     public float SpinningMaxSpeed;
     public float BounceForce;
     public int Reward;
+    public float Radius;
 }

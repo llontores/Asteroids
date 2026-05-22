@@ -12,4 +12,5 @@ public class AsteroidConfig
     public int MaxFragmentAmount;
     public float BounceForce;
     public int Reward;
+    public float Radius;
 }

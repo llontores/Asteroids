@@ -9,4 +9,5 @@ public class FragmentConfig
     public float BounceForce;
     public int Reward;
     public int MaxDegree;
+    public float Radius;
 }

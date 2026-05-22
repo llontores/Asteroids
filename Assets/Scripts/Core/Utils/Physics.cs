@@ -3,7 +3,7 @@ using UnityEngine.Events;
 
 public class Physics
 {
-    public Vector2 Velocity;
+    public Vector2 Velocity{get; private set;}
     private Vector2 _acceleration;
     private float _thrust;
     private float _dragForce;

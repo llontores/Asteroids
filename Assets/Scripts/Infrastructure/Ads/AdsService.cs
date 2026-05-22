@@ -20,19 +20,37 @@ public class AdsService : IInitializable, IDisposable
         _signalBus.Subscribe<RestartButtonPressedSignal>(OnRestartRequested);
     }
 
-    public void Dispose() => _signalBus.Unsubscribe<RestartButtonPressedSignal>(OnRestartRequested);
+    public void Dispose()
+    {
+        _signalBus.Unsubscribe<RestartButtonPressedSignal>(OnRestartRequested);
+        
+        if (_interstitialAd != null)
+        {
+            _interstitialAd.OnAdFullScreenContentClosed -= OnAdClosedHandler;
+        }
+    }
 
     private void OnRestartRequested()
     {
         if (_interstitialAd != null && _interstitialAd.CanShowAd())
         {
-            _interstitialAd.OnAdFullScreenContentClosed += () => RestartGame();
-                _interstitialAd.Show();
+            _interstitialAd.OnAdFullScreenContentClosed += OnAdClosedHandler;
+            _interstitialAd.Show();
         }
         else
         {
             RestartGame(); 
         }
+    }
+    
+    private void OnAdClosedHandler()
+    {
+        if (_interstitialAd != null)
+        {
+            _interstitialAd.OnAdFullScreenContentClosed -= OnAdClosedHandler;
+        }
+        
+        RestartGame();
     }
 
     private void RestartGame()

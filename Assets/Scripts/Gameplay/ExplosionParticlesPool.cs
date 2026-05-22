@@ -50,13 +50,13 @@ public class ExplosionParticlesPool : MonoBehaviour
     private void Start()
     {
         _signalBus.Subscribe<DestroyableDiedSignal>(SetParticles);
-        _signalBus.Subscribe<RestartButtonPressedSignal>(ResetPoolForNewGame);
+        _signalBus.Subscribe<PlayerDeadSignal>(ResetPoolForNewGame);
     }
 
     private void OnDestroy()
     {
         _signalBus.Unsubscribe<DestroyableDiedSignal>(SetParticles);
-        _signalBus.Unsubscribe<RestartButtonPressedSignal>(ResetPoolForNewGame);
+        _signalBus.Unsubscribe<PlayerDeadSignal>(ResetPoolForNewGame);
         
         if (_sessionCts != null)
         {
@@ -76,7 +76,7 @@ public class ExplosionParticlesPool : MonoBehaviour
         }
     }
 
-    private async UniTaskVoid LaunchParticles(ParticleSystem particle)
+    private async UniTask LaunchParticles(ParticleSystem particle)
     {
         bool isCancelled = await UniTask.Delay(TimeSpan.FromSeconds(_effectDuration), 
             cancellationToken: _sessionCts.Token).SuppressCancellationThrow();

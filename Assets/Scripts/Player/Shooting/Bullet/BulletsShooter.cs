@@ -9,7 +9,6 @@ public class BulletsShooter : IInitializable, IDisposable
     private SignalBus _signalBus;
     private Transform _shootPoint;
     private int _bulletShootCooldown;
-    private float _laserShootCooldown;
     private Bullet _bulletPrefab;
     private bool _canShootBullets = true;
     private CancellationTokenSource _cancellationToken;
@@ -20,15 +19,16 @@ public class BulletsShooter : IInitializable, IDisposable
     private PlayerFacade _playerFacade;
     private BulletsContainer _bulletsContainer;
     private Bullet.Factory _bulletFactory;
-    
+
     public ObjectPool<Bullet> BulletPool { get; private set; }
-    
+
     [Inject]
-    public void Construct(PlayerFacade playerFacade, SignalBus signalBus, BulletsContainer bulletsContainer, 
-        BulletsShooterConfig shooterConfig, PlayerConfig playerConfig, PlayerReferences playerReferences, Bullet.Factory bulletFactory)
+    public void Construct(PlayerFacade playerFacade, SignalBus signalBus, BulletsContainer bulletsContainer,
+        BulletsShooterConfig shooterConfig, PlayerConfig playerConfig, PlayerReferences playerReferences,
+        Bullet.Factory bulletFactory)
     {
-        _playerConfig =  playerConfig;
-        _shooterConfig = shooterConfig; 
+        _playerConfig = playerConfig;
+        _shooterConfig = shooterConfig;
         _playerFacade = playerFacade;
         _signalBus = signalBus;
         _playerReferences = playerReferences;
@@ -46,10 +46,12 @@ public class BulletsShooter : IInitializable, IDisposable
         _shootPoint = _playerReferences.ShootPoint;
         _bulletShootCooldown = _playerConfig.BulletsShootCooldown;
         _cancellationToken = new CancellationTokenSource();
+        _signalBus.Subscribe<PlayerDeadSignal>(StopCooldown);
     }
 
     public void Dispose()
     {
+        _signalBus.Unsubscribe<PlayerDeadSignal>(StopCooldown);
         _signalBus.Unsubscribe<BulletShootSignal>(FireBullets);
         _cancellationToken.Cancel();
         _cancellationToken.Dispose();
@@ -67,9 +69,16 @@ public class BulletsShooter : IInitializable, IDisposable
             bullet.gameObject.SetActive(true);
             bullet.OnBulletDestroyed += ReturnBulletToPool;
             _canShootBullets = false;
+            BulletsCooldown().Forget();
         }
+    }
 
-        BulletsCooldown().Forget();
+    public void StopCooldown()
+    {
+        _cancellationToken.Cancel();
+        _cancellationToken.Dispose();
+        _cancellationToken = new CancellationTokenSource(); 
+        _canShootBullets = true;
     }
 
     private async UniTask BulletsCooldown()

@@ -4,5 +4,6 @@
   "MaxSpeed": 300.0,
   "BounceForce": 5.0,
   "Reward": 2,
-  "MaxDegree": 360
+  "MaxDegree": 360,
+  "Radius": 0.378
 }

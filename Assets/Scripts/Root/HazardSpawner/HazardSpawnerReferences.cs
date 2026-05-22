@@ -5,15 +5,22 @@ public class HazardSpawnerReferences : MonoBehaviour
     [SerializeField] private Transform[] _spawnPoints;
     
     [Header("Prefabs")]
-    public UFO UfoPrefab;
-    public Asteroid AsteroidPrefab;
-    public Fragment FragmentPrefab;
+    [SerializeField] private UFO _ufoPrefab;
+    [SerializeField] private Asteroid _asteroidPrefab;
+    [SerializeField] private Fragment _fragmentPrefab;
 
     [Header("Containers")]
-    public Transform UfoContainer;
-    public Transform AsteroidContainer;
-    public Transform FragmentContainer;
+    [SerializeField] private Transform _ufoContainer;
+    [SerializeField] private Transform _asteroidContainer;
+    [SerializeField] private Transform _fragmentContainer;
 
+    public UFO UfoPrefab => _ufoPrefab;
+    public Asteroid AsteroidPrefab => _asteroidPrefab;
+    public Fragment FragmentPrefab => _fragmentPrefab;
+    public Transform UfoContainer => _ufoContainer;
+    public Transform AsteroidContainer => _asteroidContainer;
+    public Transform FragmentContainer => _fragmentContainer;
+    
     public Transform GetRandomSpawnPoint() 
         => _spawnPoints[Random.Range(0, _spawnPoints.Length)];
 

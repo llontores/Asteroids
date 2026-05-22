@@ -16,7 +16,7 @@ public class BulletMover
         
         if (_physics != null)
         {
-            _physics.Velocity = Vector2.zero;
+            _physics.ResetVelocity();
         }
     }
 
